@@ -1,0 +1,18 @@
+{
+  "globalDependencies": {
+    "express": "registry:dt/express#4.0.0+20160317120654",
+    "express-graphql": "registry:dt/express-graphql#0.0.0+20160316155526",
+    "express-serve-static-core": "registry:dt/express-serve-static-core#0.0.0+20160602151406",
+    "flux": "registry:dt/flux#0.0.0+20160608061134",
+    "jquery": "registry:dt/jquery#1.10.0+20160417213236",
+    "mime": "registry:dt/mime#0.0.0+20160316155526",
+    "mongodb": "registry:dt/mongodb#2.1.0+20160602142941",
+    "node": "registry:dt/node#6.0.0+20160608110640",
+    "react": "registry:dt/react#0.14.0+20160602151522",
+    "react-dom": "registry:dt/react-dom#0.14.0+20160412154040",
+    "serve-static": "registry:dt/serve-static#0.0.0+20160606155157"
+  },
+  "dependencies": {
+    "graphql": "registry:npm/graphql#0.5.0+20160602041655"
+  }
+}

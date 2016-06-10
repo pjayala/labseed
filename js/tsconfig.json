@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "sourceMap": true,
+    "module": "commonjs",
+    "jsx": "react",
+    "outDir": "dist"
+  },
+  "files": [
+    "../typings/index.d.ts",
+    "../node_modules/typescript/lib/lib.es6.d.ts",
+
+    "app.tsx",
+    "api.ts",
+    "app-dispatcher.ts",
+    "constants.ts",
+
+    "actions/server-actions.ts",
+    "components/main.tsx",
+    "stores/seed-store.ts"
+  ],
+  // "exclude": [
+  //   "node_modules",
+  //   "dist",
+  //   "Gruntfile.js"
+  // ],
+  "compileOnSave": true
+}
