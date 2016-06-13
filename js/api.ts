@@ -10,6 +10,12 @@ export class API {
           _id,
           name,
           description,
+          user {
+            id,
+            name,
+            surname,
+            email
+          }
           location
         }
       }`
