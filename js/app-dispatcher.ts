@@ -1,3 +1,3 @@
 import * as Flux from 'flux';
 
-export let appDispatcher = new Flux.Dispatcher();
+export let appDispatcher: Flux.Dispatcher<{}> = new Flux.Dispatcher();

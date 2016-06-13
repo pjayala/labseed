@@ -1,5 +1,5 @@
 
 
-export const ActionTypes = {
+export const ActionTypes: any = {
   RECEIVE_SEEDS: 'RECEIVE_SEEDS'
 };

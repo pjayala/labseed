@@ -3,7 +3,7 @@ import { post } from 'jquery';
 import { serverActions } from './actions/server-actions.ts';
 
 export class API {
-  fetchSeeds() {
+  public fetchSeeds(): any {
     post('/graphql', {
       query: `{
         seeds {
@@ -24,3 +24,4 @@ export class API {
     });
   }
 };
+

@@ -3,10 +3,12 @@ import { EventEmitter } from 'events';
 import { appDispatcher } from '../app-dispatcher.ts';
 import { ActionTypes } from '../constants.ts';
 
-class SeedStore extends EventEmitter {
-  private seeds = [];
+import { ISeed } from '../models/index.ts';
 
-  constructor(props) {
+class SeedStore extends EventEmitter {
+  private seeds: ISeed[] = [];
+
+  constructor() {
     super();
 
     appDispatcher.register((action: any) => {
@@ -21,9 +23,9 @@ class SeedStore extends EventEmitter {
     });
   }
 
-  getAll() {
+  public getAll() {
     return this.seeds;
   }
 }
 
-export let seedStore = new SeedStore({});
+export let seedStore: SeedStore = new SeedStore();

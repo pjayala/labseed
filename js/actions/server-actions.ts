@@ -1,8 +1,10 @@
 import { appDispatcher } from '../app-dispatcher.ts';
 import { ActionTypes } from '../constants.ts';
 
+import { ISeed } from '../models/index.ts';
+
 class ServerActions {
-  receiveSeeds(seeds) {
+  public receiveSeeds(seeds: ISeed[]) {
     appDispatcher.dispatch({
       actionType: ActionTypes.RECEIVE_SEEDS,
       seeds: seeds
@@ -10,4 +12,4 @@ class ServerActions {
   }
 }
 
-export const serverActions = new ServerActions();
+export const serverActions: ServerActions = new ServerActions();

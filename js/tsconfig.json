@@ -1,10 +1,11 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "es6",
     "sourceMap": true,
     "module": "commonjs",
-    "jsx": "react",
-    "outDir": "dist"
+    "jsx": "preserve",
+    "outDir": "dist",
+    "experimentalDecorators": true
   },
   "files": [
     "../typings/index.d.ts",

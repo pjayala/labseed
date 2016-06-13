@@ -1,56 +1,41 @@
 import * as React from 'react';
-import { get } from 'jquery';
 
 import { API } from '../api.ts';
 import { seedStore } from '../stores/seed-store.ts';
 
-interface User {
-  _id: number;
-  id: string;
-  name: string;
-  surename: string;
-  email: string;
-};
+import { ISeed } from '../models/index.ts';
 
-interface Seed {
-  _id: number;
-  name: string;
-  description: string;
-  user: User;
-  location: string;
-};
-
-interface MainState {
-  seeds: Seed[];
+interface IMainState {
+  seeds: ISeed[];
 }
 
-interface MainProps {
+interface IMainProps {
   limit?: number;
 }
 
-export class Main extends React.Component<MainProps, MainState> {
-  constructor(props) {
+export class Main extends React.Component<IMainProps, IMainState> {
+  constructor(props: IMainProps) {
     super(props);
 
     this.state = this.getAppState();
   }
 
-  componentDidMount() {
-    let api = new API();
+  public componentDidMount(): any {
+    let api: API = new API();
     api.fetchSeeds();
     seedStore.on('change', this.onChange.bind(this));
   }
 
-  componentWillUnmount() {
+  public componentWillUnmount(): any {
     seedStore.removeListener('change', this.onChange);
   }
 
-  onChange() {
+  public onChange(): any {
     this.setState(this.getAppState());
   }
 
-  render() {
-    const content = this.state.seeds.slice(0, this.props.limit).map(seed => {
+  public render(): any {
+    const content: React.HTMLProps<HTMLLIElement> = this.state.seeds.slice(0, this.props.limit).map(seed => {
       return <li key={seed._id}>
         {seed.name} | {seed.location} | {seed.description} | {seed.user.id} | {seed.user.email}
       </li>;
@@ -65,7 +50,7 @@ export class Main extends React.Component<MainProps, MainState> {
     );
   }
 
-  private getAppState() {
+  private getAppState(): IMainState {
     return { seeds: seedStore.getAll() };
   }
 };
