@@ -1,7 +1,7 @@
 import { IUser } from './user.model.ts';
 
 export interface ISeed {
-  _id: number;
+  id: number;
   name: string;
   description: string;
   user: IUser;

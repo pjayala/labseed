@@ -1,57 +1,71 @@
 import * as React from 'react';
-
-import { API } from '../api.ts';
-import { seedStore } from '../stores/seed-store.ts';
+import { createContainer, RelayProp } from 'react-relay';
+let Relay: any = require('react-relay');
 
 import { ISeed } from '../models/index.ts';
+import { Seed } from './seed.tsx';
 
 interface IMainState {
-  seeds: ISeed[];
+  seed: ISeed[];
+}
+
+
+interface IEdges {
+  node: ISeed;
+}
+interface ISeedConnection {
+  edges: IEdges[];
 }
 
 interface IMainProps {
   limit?: number;
+  relay: RelayProp;
+  store: {
+    seedConnection: ISeedConnection;
+  };
 }
 
-export class Main extends React.Component<IMainProps, IMainState> {
-  constructor(props: IMainProps) {
-    super(props);
-
-    this.state = this.getAppState();
-  }
-
-  public componentDidMount(): any {
-    let api: API = new API();
-    api.fetchSeeds();
-    seedStore.on('change', this.onChange.bind(this));
-  }
-
-  public componentWillUnmount(): any {
-    seedStore.removeListener('change', this.onChange);
-  }
-
-  public onChange(): any {
-    this.setState(this.getAppState());
+export class MainComponent extends React.Component<IMainProps, IMainState> {
+  public setLimit: any = (e: any): void => {
+    let newLimit: number = Number(e.target.value);
+    this.props.relay.setVariables({ limit: newLimit });
   }
 
   public render(): any {
-    const content: React.HTMLProps<HTMLLIElement> = this.state.seeds.slice(0, this.props.limit).map(seed => {
-      return <li key={seed._id}>
-        {seed.name} | {seed.location} | {seed.description} | {seed.user.id} | {seed.user.email}
-      </li>;
-    });
+    const content: React.HTMLProps<HTMLLIElement> =
+      this.props.store.seedConnection.edges.map(edge => {
+        return <Seed key={edge.node.id} seed={edge.node}/>;
+      });
     return (
       <div>
         <h3>Seeds</h3>
+        <select onChange={this.setLimit} default={this.props.relay.variables.limit}>
+          <option value='2'>2</option>
+          <option value='4'>4</option>
+        </select>
         <ul>
           {content}
         </ul>
       </div>
     );
   }
-
-  private getAppState(): IMainState {
-    return { seeds: seedStore.getAll() };
-  }
 };
 
+export let Main: any = createContainer(MainComponent, {
+  initialVariables: {
+    limit: 4
+  },
+  fragments: {
+    store: () => Relay.QL`
+    fragment on Store {
+      seedConnection(first: $limit) {
+        edges {
+          node {
+            id,
+            ${Seed.getFragment('seed')}
+          }
+        }
+      }
+    }`
+  }
+});

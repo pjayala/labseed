@@ -10,20 +10,16 @@
   "files": [
     "../typings/index.d.ts",
     "../node_modules/typescript/lib/lib.es6.d.ts",
+    "../custom-typings/relay.d.ts",
 
     "app.tsx",
-    "api.ts",
-    "app-dispatcher.ts",
-    "constants.ts",
 
-    "actions/server-actions.ts",
     "components/main.tsx",
-    "stores/seed-store.ts"
+    "components/seed.tsx"
   ],
   // "exclude": [
-  //   "node_modules",
-  //   "dist",
-  //   "Gruntfile.js"
+  //   "../node_modules",
+  //   "../dist"
   // ],
   "compileOnSave": true
 }

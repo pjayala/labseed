@@ -1,9 +1,34 @@
-import { GraphQLSchema, GraphQLObjectType, GraphQLInt, GraphQLString, GraphQLList, GraphQLID } from 'graphql';
+import { GraphQLSchema, GraphQLObjectType, GraphQLInt, GraphQLNonNull, GraphQLString, GraphQLList, GraphQLID } from 'graphql';
 import { Db } from 'mongodb';
+import { connectionDefinitions, connectionArgs, connectionFromPromisedArray, GraphQLConnectionDefinitions } from 'graphql-relay';
 
-export let Schema = (db: Db) => {
 
-  let userType = new GraphQLObjectType({
+export const Schema = (db: Db) => {
+  let seedType: GraphQLObjectType;
+  let userType: GraphQLObjectType;
+  let seedConnection: GraphQLConnectionDefinitions;
+
+  let store: any = {};
+
+  let storeType: GraphQLObjectType = new GraphQLObjectType({
+    name: 'Store',
+    fields: () => ({
+      seedConnection: {
+        type: seedConnection.connectionType,
+        args: connectionArgs,
+        resolve: (_, args) => connectionFromPromisedArray(
+          db.collection('seeds').find({}).limit(Number(args['limit'])).toArray(),
+          args
+        )
+      },
+      users: {
+        type: new GraphQLList(userType),
+        resolve: () => db.collection('users').find({}).toArray()
+      }
+    })
+  });
+
+  userType = new GraphQLObjectType({
     name: 'user',
     fields: () => ({
       _id: { type: GraphQLString },
@@ -19,10 +44,13 @@ export let Schema = (db: Db) => {
     })
   });
 
-  let seedType = new GraphQLObjectType({
+  seedType = new GraphQLObjectType({
     name: 'seed',
     fields: () => ({
-      _id: { type: GraphQLString },
+      id: {
+        type: new GraphQLNonNull(GraphQLID),
+        resolve: (obj) => obj._id
+      },
       name: { type: GraphQLString },
       description: { type: GraphQLString },
       user: {
@@ -34,22 +62,23 @@ export let Schema = (db: Db) => {
     })
   });
 
-  let schema = new GraphQLSchema({
+  seedConnection = connectionDefinitions({
+    name: 'seed',
+    nodeType: seedType
+  });
+
+  let schema: GraphQLSchema = new GraphQLSchema({
     query: new GraphQLObjectType({
       name: 'Query',
       fields: () => ({
-        seeds: {
-          type: new GraphQLList(seedType),
-          resolve: () => db.collection('seeds').find({}).toArray()
-        },
-        users: {
-          type: new GraphQLList(userType),
-          resolve: () => db.collection('users').find({}).toArray()
+        store: {
+          type: storeType,
+          resolve: () => store
         }
       })
     })
   });
 
   return schema;
-}
+};
 

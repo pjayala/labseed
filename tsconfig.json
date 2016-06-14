@@ -5,12 +5,6 @@
     "module": "commonjs",
     "jsx": "react"
   },
-  // "files": [
-  //   "typings/index.d.ts",
-  //   "js/app.tsx",
-  //   "js/components/Hello.tsx",
-  //   "server.ts"
-  // ],
   "exclude": [
     "node_modules",
     "dist",
