@@ -11,6 +11,7 @@ import { Schema } from './data/schema.ts';
 let app: express.Express = express();
 app.use(express.static('public'));
 
+
 let db: Db;
 
 (async () => {

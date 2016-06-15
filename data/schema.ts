@@ -7,6 +7,7 @@ export const Schema = (db: Db) => {
   let seedType: GraphQLObjectType;
   let userType: GraphQLObjectType;
   let seedConnection: GraphQLConnectionDefinitions;
+  let userConnection: GraphQLConnectionDefinitions;
 
   let store: any = {};
 
@@ -21,9 +22,13 @@ export const Schema = (db: Db) => {
           args
         )
       },
-      users: {
-        type: new GraphQLList(userType),
-        resolve: () => db.collection('users').find({}).toArray()
+      userConnection: {
+        type: userConnection.connectionType,
+        args: connectionArgs,
+        resolve: (_, args) => connectionFromPromisedArray(
+          db.collection('users').find({}).limit(Number(args['limit'])).toArray(),
+          args
+        )
       }
     })
   });
@@ -32,7 +37,10 @@ export const Schema = (db: Db) => {
     name: 'user',
     fields: () => ({
       _id: { type: GraphQLString },
-      id: { type: GraphQLString },
+      id: {
+        type: new GraphQLNonNull(GraphQLID),
+        resolve: (obj) => obj.id
+      },
       name: { type: GraphQLString },
       surname: { type: GraphQLString },
       email: { type: GraphQLString },
@@ -65,6 +73,11 @@ export const Schema = (db: Db) => {
   seedConnection = connectionDefinitions({
     name: 'seed',
     nodeType: seedType
+  });
+
+  userConnection = connectionDefinitions({
+    name: 'user',
+    nodeType: userType
   });
 
   let schema: GraphQLSchema = new GraphQLSchema({

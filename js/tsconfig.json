@@ -13,9 +13,12 @@
     "../custom-typings/relay.d.ts",
 
     "app.tsx",
+    "relay-container.tsx",
 
-    "components/main.tsx",
-    "components/seed.tsx"
+    "components/app.tsx",
+    "components/seed-list.tsx",
+    "components/seed.tsx",
+    "components/user-list.tsx"
   ],
   // "exclude": [
   //   "../node_modules",
