@@ -1,9 +1,8 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { Router, browserHistory, Link } from 'react-router';
-import { Route, RootContainer } from 'react-relay';
+import { Router, browserHistory } from 'react-router';
+import { Route } from 'react-relay';
 let Relay: any = require('react-relay');
-let ReactRouterRelay: any = require('react-router-relay');
 let ReactRouter: any = require('react-router');
 
 import { createRelayContainer } from './relay-container.tsx';

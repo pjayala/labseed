@@ -1,6 +1,20 @@
-import { GraphQLSchema, GraphQLObjectType, GraphQLInt, GraphQLNonNull, GraphQLString, GraphQLList, GraphQLID } from 'graphql';
-import { Db } from 'mongodb';
-import { connectionDefinitions, connectionArgs, connectionFromPromisedArray, GraphQLConnectionDefinitions } from 'graphql-relay';
+import {
+  GraphQLSchema,
+  GraphQLObjectType,
+  GraphQLNonNull,
+  GraphQLString,
+  GraphQLList,
+  GraphQLID
+} from 'graphql';
+import { Db, InsertOneWriteOpResult } from 'mongodb';
+import {
+  connectionDefinitions,
+  connectionArgs,
+  connectionFromPromisedArray,
+  GraphQLConnectionDefinitions,
+  mutationWithClientMutationId,
+  globalIdField
+} from 'graphql-relay';
 
 
 export const Schema = (db: Db) => {
@@ -14,11 +28,15 @@ export const Schema = (db: Db) => {
   let storeType: GraphQLObjectType = new GraphQLObjectType({
     name: 'Store',
     fields: () => ({
+      id: globalIdField('store'),
       seedConnection: {
         type: seedConnection.connectionType,
         args: connectionArgs,
         resolve: (_, args) => connectionFromPromisedArray(
-          db.collection('seeds').find({}).limit(Number(args['limit'])).toArray(),
+          db.collection('seeds')
+            .find({})
+            .limit(Number(args['limit']))
+            .toArray(),
           args
         )
       },
@@ -26,7 +44,11 @@ export const Schema = (db: Db) => {
         type: userConnection.connectionType,
         args: connectionArgs,
         resolve: (_, args) => connectionFromPromisedArray(
-          db.collection('users').find({}).limit(Number(args['limit'])).toArray(),
+          db.collection('users')
+            .find({})
+            .sort({ createdAt: -1 })
+            .limit(Number(args['limit']))
+            .toArray(),
           args
         )
       }
@@ -44,6 +66,10 @@ export const Schema = (db: Db) => {
       name: { type: GraphQLString },
       surname: { type: GraphQLString },
       email: { type: GraphQLString },
+      createdAt: {
+        type: GraphQLString,
+        resolve: (obj) => new Date(obj.createdAt).toISOString()
+      },
       seeds: {
         type: new GraphQLList(seedType),
         resolve: (parent, args) =>
@@ -80,6 +106,38 @@ export const Schema = (db: Db) => {
     nodeType: userType
   });
 
+  interface IUser {
+    id: string;
+    name: string;
+    surname: string;
+    email: string;
+    createdAt?: number;
+  }
+
+  let createUserMutation: any = mutationWithClientMutationId({
+    name: 'CreateUser',
+    inputFields: {
+      id: { type: new GraphQLNonNull(GraphQLString) },
+      name: { type: new GraphQLNonNull(GraphQLString) },
+      surname: { type: new GraphQLNonNull(GraphQLString) },
+      email: { type: new GraphQLNonNull(GraphQLString) }
+    },
+    outputFields: {
+      userEdge: {
+        type: userConnection.edgeType,
+        resolve: (obj: InsertOneWriteOpResult) => ({ node: obj.ops[0], cursor: obj.insertedId })
+      },
+      store: {
+        type: storeType,
+        resolve: () => store
+      }
+    },
+    mutateAndGetPayload: (user: IUser) => {
+      user.createdAt = Date.now();
+      return db.collection('users').insertOne(user);
+    }
+  });
+
   let schema: GraphQLSchema = new GraphQLSchema({
     query: new GraphQLObjectType({
       name: 'Query',
@@ -88,6 +146,13 @@ export const Schema = (db: Db) => {
           type: storeType,
           resolve: () => store
         }
+      })
+    }),
+
+    mutation: new GraphQLObjectType({
+      name: 'Mutation',
+      fields: () => ({
+        createUser: createUserMutation
       })
     })
   });

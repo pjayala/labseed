@@ -24,7 +24,7 @@ let db: Db;
       graphiql: true
     }));
 
-    app.get('*', function (req, res) {
+    app.get('*', function (req: express.Request, res: express.Response) {
       res.sendFile(__dirname + '/public/index.html');
     });
 

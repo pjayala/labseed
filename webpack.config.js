@@ -22,10 +22,14 @@ module.exports = {
         loaders: ['babel-loader', 'ts-loader']
       }
     ]
-  }, 
+  },
   resolve: {
     extensions: ['', '.js', '.ts', '.tsx'],
-    modulesDirectories: ['node_modules']
+    modulesDirectories: ['node_modules'],
+    alias: {
+      //change /src/lib/bower/moment/moment.js to the location of your moment.js file
+      moment: path.join(__dirname, "/node_modules/momentjs/build/moment.min.js")
+    }
   },
   devServer: {
     port: 3000
