@@ -5,6 +5,7 @@
     "express-serve-static-core": "registry:dt/express-serve-static-core#0.0.0+20160602151406",
     "flux": "registry:dt/flux#0.0.0+20160608061134",
     "jquery": "registry:dt/jquery#1.10.0+20160417213236",
+    "lodash": "registry:dt/lodash#3.10.0+20160619033623",
     "mime": "registry:dt/mime#0.0.0+20160316155526",
     "moment-node": "registry:dt/moment-node#2.11.1+20160511043338",
     "mongodb": "registry:dt/mongodb#2.1.0+20160602142941",

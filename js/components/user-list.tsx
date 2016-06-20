@@ -1,11 +1,13 @@
 import * as React from 'react';
 import * as moment from 'moment';
+import { debounce } from 'lodash';
 
 import { createContainer, RelayProp } from 'react-relay';
 import { CreateUserMutation } from '../mutations/create-user.mutation.ts';
 
 let Relay: any = require('react-relay');
 
+import { User } from './user.tsx';
 import { IUser } from '../models/index.ts';
 
 interface IMainState {
@@ -28,6 +30,10 @@ interface IMainProps {
 }
 
 export class UserListComponent extends React.Component<IMainProps, IMainState> {
+
+
+  private setVariables: any = debounce(this.props.relay.setVariables, 300);
+
   refs: {
     [string: string]: any;
     newId: any;
@@ -39,6 +45,10 @@ export class UserListComponent extends React.Component<IMainProps, IMainState> {
   public setLimit: any = (e: any): void => {
     let newLimit: number = Number(e.target.value);
     this.props.relay.setVariables({ limit: newLimit });
+  }
+
+  public search: any = (e: any): void => {
+    this.setVariables({ query: e.target.value });
   }
 
   public handleSubmit: any = (e: any): void => {
@@ -68,17 +78,18 @@ export class UserListComponent extends React.Component<IMainProps, IMainState> {
   public render(): any {
     const content: React.HTMLProps<HTMLLIElement> =
       this.props.store.userConnection.edges.map(edge => {
-        return <li key={edge.node.id}>
-          {this.dateLabel(edge.node) } | {edge.node.email}
-          </li>;
+        return <User key={edge.node.id} user={edge.node}/>;
       });
     return (
       <div>
         <h3>Users</h3>
         <select onChange={this.setLimit} defaultValue={this.props.relay.variables.limit}>
-          <option value='2'>2</option>
-          <option value='4'>4</option>
+          <option value='10'>10</option>
+          <option value='20'>20</option>
+          <option value='30'>30</option>
         </select>
+
+        <input type='text' placeholder='Search' onChange={this.search}/>
 
         <form onSubmit={this.handleSubmit}>
           <input type='test' placeholder='id' ref='newId'/>
@@ -99,21 +110,21 @@ export class UserListComponent extends React.Component<IMainProps, IMainState> {
 
 export let UserList: any = createContainer(UserListComponent, {
   initialVariables: {
-    limit: 4
+    limit: 10,
+    query: ''
   },
   fragments: {
     store: () => Relay.QL`
-    fragment on Store {
-      id,
-      userConnection(first: $limit) {
-        edges {
-          node {
-            id,
-            email,
-            createdAt
+      fragment on Store {
+        id,
+        userConnection(first: $limit, query: $query) {
+          edges {
+            node {
+              id,
+              ${User.getFragment('user')}
+            }
           }
         }
-      }
-    }`
+      }`
   }
 });

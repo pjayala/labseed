@@ -18,6 +18,7 @@
     "graphql-relay": "^0.4.2",
     "history": "^3.0.0",
     "jquery": "^3.0.0",
+    "lodash": "^4.13.1",
     "momentjs": "^1.1.7",
     "mongodb": "^2.1.18",
     "react": "^15.1.0",

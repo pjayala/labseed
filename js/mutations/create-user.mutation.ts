@@ -34,7 +34,7 @@ export class CreateUserMutation extends Mutation<any, any> {
       connectionName: 'userConnection',
       edgeName: 'userEdge',
       rangeBehaviors: {
-        '': 'prepend'
+        'query()': 'prepend'
       }
     }];
   }

@@ -8,7 +8,6 @@ export function createRelayContainer(Component: any, props: any) {
     return (
       <Relay.RootContainer
         Component={Component}
-        renderFetched={(data) => <Component {...props} {...data} />}
         route={new route() }
         />
     );

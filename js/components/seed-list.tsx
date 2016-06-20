@@ -39,7 +39,7 @@ export class SeedListComponent extends React.Component<IMainProps, IMainState> {
     return (
       <div>
         <h3>Seeds</h3>
-        <select onChange={this.setLimit} default={this.props.relay.variables.limit}>
+        <select onChange={this.setLimit} defaultValue={this.props.relay.variables.limit}>
           <option value='2'>2</option>
           <option value='4'>4</option>
         </select>
@@ -53,19 +53,19 @@ export class SeedListComponent extends React.Component<IMainProps, IMainState> {
 
 export let SeedList: any = createContainer(SeedListComponent, {
   initialVariables: {
-    limit: 4
+    limit: 2
   },
   fragments: {
     store: () => Relay.QL`
-    fragment on Store {
-      seedConnection(first: $limit) {
-        edges {
-          node {
-            id,
-            ${Seed.getFragment('seed')}
+      fragment on Store {
+        seedConnection(first: $limit) {
+          edges {
+            node {
+              id,
+              ${Seed.getFragment('seed')}
+            }
           }
         }
-      }
-    }`
+      }`
   }
 });

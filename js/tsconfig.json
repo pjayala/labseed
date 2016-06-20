@@ -18,7 +18,8 @@
     "components/app.tsx",
     "components/seed-list.tsx",
     "components/seed.tsx",
-    "components/user-list.tsx"
+    "components/user-list.tsx",
+    "components/user.tsx"
   ],
   // "exclude": [
   //   "../node_modules",

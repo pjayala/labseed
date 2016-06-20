@@ -13,22 +13,50 @@ import {
   connectionFromPromisedArray,
   GraphQLConnectionDefinitions,
   mutationWithClientMutationId,
-  globalIdField
+  globalIdField,
+  nodeDefinitions,
+  GraphQLNodeDefinitions,
+  fromGlobalId,
+  ResolvedGlobalId
 } from 'graphql-relay';
 
 
 export const Schema = (db: Db) => {
+  let storeType: GraphQLObjectType;
   let seedType: GraphQLObjectType;
   let userType: GraphQLObjectType;
   let seedConnection: GraphQLConnectionDefinitions;
   let userConnection: GraphQLConnectionDefinitions;
 
-  let store: any = {};
+  class Store { };
+  let store: any = new Store();
 
-  let storeType: GraphQLObjectType = new GraphQLObjectType({
+  let nodeDefs: GraphQLNodeDefinitions = nodeDefinitions(
+    (globalId) => {
+      let global: ResolvedGlobalId = fromGlobalId(globalId);
+      if (global.type === 'Store') {
+        return store;
+      }
+      return null;
+    },
+    (obj) => {
+      if (obj instanceof Store) {
+        return storeType;
+      }
+      return null;
+    }
+  );
+
+  let connectionArgsExt: any = {
+    query: { type: GraphQLString },
+    field: { type: GraphQLString }
+  };
+  Object.assign(connectionArgsExt, connectionArgs);
+
+  storeType = new GraphQLObjectType({
     name: 'Store',
     fields: () => ({
-      id: globalIdField('store'),
+      id: globalIdField('Store'),
       seedConnection: {
         type: seedConnection.connectionType,
         args: connectionArgs,
@@ -42,17 +70,27 @@ export const Schema = (db: Db) => {
       },
       userConnection: {
         type: userConnection.connectionType,
-        args: connectionArgs,
-        resolve: (_, args) => connectionFromPromisedArray(
-          db.collection('users')
-            .find({})
-            .sort({ createdAt: -1 })
-            .limit(Number(args['limit']))
-            .toArray(),
-          args
-        )
+        args: connectionArgsExt,
+        resolve: (_, args) => {
+          let findParams: any = {};
+          if (args['query']) {
+            findParams[args['field'] || 'id'] = new RegExp(args['query'], 'i');
+          }
+          if (!args['limit'] || args['limit'] > 200) {
+            args['limit'] = 100
+          }
+          return connectionFromPromisedArray(
+            db.collection('users')
+              .find(findParams)
+              .sort({ createdAt: -1 })
+              .limit(Number(args['limit']))
+              .toArray(),
+            args
+          );
+        }
       }
-    })
+    }),
+    interfaces: [nodeDefs.nodeInterface]
   });
 
   userType = new GraphQLObjectType({
@@ -142,6 +180,7 @@ export const Schema = (db: Db) => {
     query: new GraphQLObjectType({
       name: 'Query',
       fields: () => ({
+        node: nodeDefs.nodeField,
         store: {
           type: storeType,
           resolve: () => store
