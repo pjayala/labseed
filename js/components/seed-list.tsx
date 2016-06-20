@@ -1,19 +1,24 @@
 import * as React from 'react';
 import { createContainer, RelayProp } from 'react-relay';
+import { debounce } from 'lodash';
+
 let Relay: any = require('react-relay');
 
 import { ISeed } from '../models/index.ts';
 import { Seed } from './seed.tsx';
+import { IPageInfo } from '../models/index.ts';
+
+import { ShowMore } from './show-more.tsx';
 
 interface IMainState {
   seed: ISeed[];
 }
 
-
 interface IEdges {
   node: ISeed;
 }
 interface ISeedConnection {
+  pageInfo: IPageInfo;
   edges: IEdges[];
 }
 
@@ -26,9 +31,18 @@ interface IMainProps {
 }
 
 export class SeedListComponent extends React.Component<IMainProps, IMainState> {
-  public setLimit: any = (e: any): void => {
-    let newLimit: number = Number(e.target.value);
-    this.props.relay.setVariables({ limit: newLimit });
+  private setVariables: any = debounce(this.props.relay.setVariables, 300);
+
+
+  public showMore: any = (e: any): void => {
+    this.props.relay.setVariables({ limit: this.props.relay.variables.limit + 10 });
+  }
+
+  public search: any = (e: any): void => {
+    this.setVariables({
+      query: e.target.value,
+      limit: 10
+    });
   }
 
   public render(): any {
@@ -39,13 +53,11 @@ export class SeedListComponent extends React.Component<IMainProps, IMainState> {
     return (
       <div>
         <h3>Seeds</h3>
-        <select onChange={this.setLimit} defaultValue={this.props.relay.variables.limit}>
-          <option value='2'>2</option>
-          <option value='4'>4</option>
-        </select>
+        <input type='text' placeholder='Search' onChange={this.search}/>
         <ul>
           {content}
         </ul>
+        <ShowMore pageInfo={this.props.store.seedConnection.pageInfo} showMore={this.showMore}/>
       </div>
     );
   }
@@ -53,12 +65,16 @@ export class SeedListComponent extends React.Component<IMainProps, IMainState> {
 
 export let SeedList: any = createContainer(SeedListComponent, {
   initialVariables: {
-    limit: 2
+    limit: 10,
+    query: ''
   },
   fragments: {
     store: () => Relay.QL`
       fragment on Store {
-        seedConnection(first: $limit) {
+        seedConnection(first: $limit, query: $query) {
+          pageInfo{
+            hasNextPage
+          },
           edges {
             node {
               id,

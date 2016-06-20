@@ -59,14 +59,23 @@ export const Schema = (db: Db) => {
       id: globalIdField('Store'),
       seedConnection: {
         type: seedConnection.connectionType,
-        args: connectionArgs,
-        resolve: (_, args) => connectionFromPromisedArray(
-          db.collection('seeds')
-            .find({})
-            .limit(Number(args['limit']))
-            .toArray(),
-          args
-        )
+        args: connectionArgsExt,
+        resolve: (_, args) => {
+          let findParams: any = {};
+          if (args['query']) {
+            findParams[args['field'] || 'name'] = new RegExp(args['query'], 'i');
+          }
+          if (!args['limit'] || args['limit'] > 200) {
+            args['limit'] = 100
+          }
+          return connectionFromPromisedArray(
+            db.collection('seeds')
+              .find(findParams)
+              .limit(Number(args['limit']))
+              .toArray(),
+            args
+          );
+        }
       },
       userConnection: {
         type: userConnection.connectionType,

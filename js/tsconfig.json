@@ -19,7 +19,9 @@
     "components/seed-list.tsx",
     "components/seed.tsx",
     "components/user-list.tsx",
-    "components/user.tsx"
+    "components/user.tsx",
+
+    "components/show-more.tsx"
   ],
   // "exclude": [
   //   "../node_modules",

@@ -2,20 +2,19 @@ import * as React from 'react';
 import * as moment from 'moment';
 import { debounce } from 'lodash';
 
+let Relay: any = require('react-relay');
 import { createContainer, RelayProp } from 'react-relay';
 import { CreateUserMutation } from '../mutations/create-user.mutation.ts';
 
-let Relay: any = require('react-relay');
-
 import { User } from './user.tsx';
 import { IUser } from '../models/index.ts';
+import { IPageInfo } from '../models/index.ts';
+
+import { ShowMore } from './show-more.tsx';
+
 
 interface IMainState {
   user: IUser[];
-}
-
-interface IPageInfo {
-  hasNextPage: boolean;
 }
 
 interface IEdges {
@@ -35,17 +34,15 @@ interface IMainProps {
 }
 
 export class UserListComponent extends React.Component<IMainProps, IMainState> {
-
-
-  private setVariables: any = debounce(this.props.relay.setVariables, 300);
-
-  refs: {
+  public refs: {
     [string: string]: any;
     newId: any;
     newName: any;
     newSurname: any;
     newEmail: any;
-  }
+  };
+
+  private setVariables: any = debounce(this.props.relay.setVariables, 300);
 
   public showMore: any = (e: any): void => {
     this.props.relay.setVariables({ limit: this.props.relay.variables.limit + 10 });
@@ -87,10 +84,6 @@ export class UserListComponent extends React.Component<IMainProps, IMainState> {
       this.props.store.userConnection.edges.map(edge => {
         return <User key={edge.node.id} user={edge.node}/>;
       });
-    const showMoreButton: React.HTMLProps<HTMLButtonElement> | any =
-      this.props.store.userConnection.pageInfo.hasNextPage ?
-        <button type='submit' onClick={this.showMore}>Show more</button>
-        : null;
     return (
       <div>
         <h3>Users</h3>
@@ -106,12 +99,10 @@ export class UserListComponent extends React.Component<IMainProps, IMainState> {
         <ul>
           {content}
         </ul>
-        {showMoreButton}
+        <ShowMore pageInfo={this.props.store.userConnection.pageInfo} showMore={this.showMore}/>
       </div>
     );
   }
-
-
 };
 
 export let UserList: any = createContainer(UserListComponent, {
