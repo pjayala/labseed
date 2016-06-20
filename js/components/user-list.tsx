@@ -14,10 +14,15 @@ interface IMainState {
   user: IUser[];
 }
 
+interface IPageInfo {
+  hasNextPage: boolean;
+}
+
 interface IEdges {
   node: IUser;
 }
 interface IConnection {
+  pageInfo: IPageInfo;
   edges: IEdges[];
 }
 
@@ -42,9 +47,8 @@ export class UserListComponent extends React.Component<IMainProps, IMainState> {
     newEmail: any;
   }
 
-  public setLimit: any = (e: any): void => {
-    let newLimit: number = Number(e.target.value);
-    this.props.relay.setVariables({ limit: newLimit });
+  public showMore: any = (e: any): void => {
+    this.props.relay.setVariables({ limit: this.props.relay.variables.limit + 10 });
   }
 
   public search: any = (e: any): void => {
@@ -80,15 +84,13 @@ export class UserListComponent extends React.Component<IMainProps, IMainState> {
       this.props.store.userConnection.edges.map(edge => {
         return <User key={edge.node.id} user={edge.node}/>;
       });
+    const showMoreButton: React.HTMLProps<HTMLButtonElement> | any =
+      this.props.store.userConnection.pageInfo.hasNextPage ?
+        <button type='submit' onClick={this.showMore}>Show more</button>
+        : null;
     return (
       <div>
         <h3>Users</h3>
-        <select onChange={this.setLimit} defaultValue={this.props.relay.variables.limit}>
-          <option value='10'>10</option>
-          <option value='20'>20</option>
-          <option value='30'>30</option>
-        </select>
-
         <input type='text' placeholder='Search' onChange={this.search}/>
 
         <form onSubmit={this.handleSubmit}>
@@ -101,6 +103,7 @@ export class UserListComponent extends React.Component<IMainProps, IMainState> {
         <ul>
           {content}
         </ul>
+        {showMoreButton}
       </div>
     );
   }
@@ -118,6 +121,9 @@ export let UserList: any = createContainer(UserListComponent, {
       fragment on Store {
         id,
         userConnection(first: $limit, query: $query) {
+          pageInfo{
+            hasNextPage
+          },
           edges {
             node {
               id,
