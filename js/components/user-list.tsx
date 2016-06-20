@@ -52,7 +52,10 @@ export class UserListComponent extends React.Component<IMainProps, IMainState> {
   }
 
   public search: any = (e: any): void => {
-    this.setVariables({ query: e.target.value });
+    this.setVariables({
+      query: e.target.value,
+      limit: 10
+    });
   }
 
   public handleSubmit: any = (e: any): void => {
