@@ -5,7 +5,8 @@ import { debounce } from 'lodash';
 let Relay: any = require('react-relay');
 import { createContainer, RelayProp } from 'react-relay';
 
-import { List, TextField, RaisedButton, Dialog, AppBar, Paper, Divider } from 'material-ui';
+import { List, TextField, RaisedButton, Dialog, AppBar, Paper, Divider, FloatingActionButton } from 'material-ui';
+import ContentAdd from 'material-ui/svg-icons/content/add';
 
 import { CreateUserMutation } from '../mutations/create-user.mutation.ts';
 
@@ -85,7 +86,7 @@ export class UserListComponent extends React.Component<IMainProps, IMainState> {
 
   public handleToggleSideMenu: any = () => {
     this.setVariables({
-      showSideMenu: ! this.props.relay.variables.showSideMenu
+      showSideMenu: !this.props.relay.variables.showSideMenu
     });
   };
 
@@ -128,21 +129,25 @@ export class UserListComponent extends React.Component<IMainProps, IMainState> {
             <TextField
               hintText='Enter a unique user id'
               floatingLabelText='User id'
+              fullWidth={true}
               ref='newId'
               /><br />
             <TextField
               hintText='User name'
               floatingLabelText='Name'
+              fullWidth={true}
               ref='newName'
               /><br />
             <TextField
               hintText='User surname'
               floatingLabelText='Surname'
+              fullWidth={true}
               ref='newSurname'
               /><br />
             <TextField
               hintText='Email address'
               floatingLabelText='Email'
+              fullWidth={true}
               ref='newEmail'
               /><br />
             <RaisedButton type='submit' label='New user' primary/>
@@ -156,8 +161,15 @@ export class UserListComponent extends React.Component<IMainProps, IMainState> {
                   <div className='box'>
                     <br/>
                     <Paper zDepth={2}>
-                      <RaisedButton label='New user' onClick={this.handleOpen} />
-
+                      <div className='row end-xs'>
+                        <div className='col-xs-2'>
+                          <div className='box'>
+                            <FloatingActionButton onClick={this.handleOpen} mini={true}>
+                              <ContentAdd />
+                            </FloatingActionButton>
+                          </div>
+                        </div>
+                      </div>
                       <List>
                         {content}
                       </List>

@@ -4,7 +4,8 @@ import { debounce } from 'lodash';
 
 let Relay: any = require('react-relay');
 
-import { List, TextField, RaisedButton, Dialog, AppBar, Paper, Divider, AutoComplete } from 'material-ui';
+import { List, TextField, RaisedButton, Dialog, AppBar, Paper, Divider, AutoComplete, FloatingActionButton } from 'material-ui';
+import ContentAdd from 'material-ui/svg-icons/content/add';
 
 import { CreateSeedMutation } from '../mutations/create-seed.mutation.ts';
 
@@ -68,7 +69,7 @@ export class SeedListComponent extends React.Component<IMainProps, IMainState> {
 
   public handleToggleSideMenu: any = () => {
     this.setVariables({
-      showSideMenu: ! this.props.relay.variables.showSideMenu
+      showSideMenu: !this.props.relay.variables.showSideMenu
     });
   };
 
@@ -151,7 +152,7 @@ export class SeedListComponent extends React.Component<IMainProps, IMainState> {
             <AutoComplete
               hintText='Select a user'
               floatingLabelText='User'
-              dataSource={this.getUsers()}
+              dataSource={this.getUsers() }
               onUpdateInput={this.handleUpdateInput}
               fullWidth={true}
               filter={(searchText: string, key: string) => true}
@@ -171,9 +172,15 @@ export class SeedListComponent extends React.Component<IMainProps, IMainState> {
                   <div className='box'>
                     <br/>
                     <Paper zDepth={2}>
-
-                      <RaisedButton label='New seed' onClick={this.handleOpen} />
-
+                      <div className='row end-xs'>
+                        <div className='col-xs-2'>
+                          <div className='box'>
+                            <FloatingActionButton onClick={this.handleOpen} mini={true}>
+                              <ContentAdd />
+                            </FloatingActionButton>
+                          </div>
+                        </div>
+                      </div>
                       <List>
                         {content}
                       </List>
