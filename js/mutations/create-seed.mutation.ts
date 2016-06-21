@@ -1,27 +1,27 @@
 import { Mutation } from 'react-relay';
 let Relay: any = require('react-relay');
 
-export class CreateUserMutation extends Mutation<any, any> {
+export class CreateSeedMutation extends Mutation<any, any> {
   public getMutation() {
     return Relay.QL`
-      mutation { createUser }
+      mutation { createSeed }
     `;
   }
 
   public getVariables() {
     return {
-      id: this.props.id,
       name: this.props.name,
-      surname: this.props.surname,
-      email: this.props.email
+      description: this.props.description,
+      location: this.props.location,
+      userId: this.props.userId
     };
   }
 
   public getFatQuery() {
     return Relay.QL`
-      fragment on CreateUserPayload {
-        userEdge,
-        store { userConnection }
+      fragment on CreateSeedPayload {
+        seedEdge,
+        store { seedConnection }
       }
     `;
   }
@@ -31,8 +31,8 @@ export class CreateUserMutation extends Mutation<any, any> {
       type: 'RANGE_ADD',
       parentName: 'store',
       parentID: this.props.store.id,
-      connectionName: 'userConnection',
-      edgeName: 'userEdge',
+      connectionName: 'seedConnection',
+      edgeName: 'seedEdge',
       rangeBehaviors: {
         'query()': 'prepend'
       }
@@ -41,12 +41,15 @@ export class CreateUserMutation extends Mutation<any, any> {
 
   public getOptimisticResponse() {
     return {
-      userEdge: {
+      seedEdge: {
         node: {
-          id: this.props.id,
+          id: '0',
           name: this.props.name,
-          surname: this.props.surname,
-          email: this.props.email
+          description: this.props.description,
+          location: this.props.location,
+          user: {
+            id: this.props.userId
+          }
         }
       }
     };

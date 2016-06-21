@@ -18,7 +18,6 @@ import { SideMenu } from './side-menu.tsx';
 
 
 interface IMainState {
-  createUser: boolean;
 }
 
 interface IEdges {
@@ -91,11 +90,11 @@ export class UserListComponent extends React.Component<IMainProps, IMainState> {
   };
 
   public handleOpen: any = () => {
-    this.setState({ createUser: true });
+    this.setVariables({ createUser: true });
   };
 
   public handleClose: any = () => {
-    this.setState({ createUser: false });
+    this.setVariables({ createUser: false });
   };
 
   public dateLabel(user: IUser): string {
@@ -122,7 +121,7 @@ export class UserListComponent extends React.Component<IMainProps, IMainState> {
         <Dialog
           title='Create new User'
           modal={false}
-          open={this.state.createUser}
+          open={this.props.relay.variables.createUser}
           onRequestClose={this.handleClose}
           >
           <form onSubmit={this.handleSubmit}>
@@ -186,7 +185,8 @@ export let UserList: any = createContainer(UserListComponent, {
   initialVariables: {
     limit: 10,
     query: '',
-    showSideMenu: false
+    showSideMenu: false,
+    createUser: false
   },
   fragments: {
     store: () => Relay.QL`

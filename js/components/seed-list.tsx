@@ -6,6 +6,8 @@ let Relay: any = require('react-relay');
 
 import { List, TextField, RaisedButton, Dialog, AppBar, Paper, Divider } from 'material-ui';
 
+import { CreateSeedMutation } from '../mutations/create-seed.mutation.ts';
+
 import { ISeed } from '../models/index.ts';
 import { Seed } from './seed.tsx';
 import { IPageInfo } from '../models/index.ts';
@@ -34,6 +36,13 @@ interface IMainProps {
 }
 
 export class SeedListComponent extends React.Component<IMainProps, IMainState> {
+  public refs: {
+    [string: string]: any;
+    newName: any;
+    newDescription: any;
+    newLocation: any;
+    newUserId: any;
+  };
   private setVariables: any = debounce(this.props.relay.setVariables, 300);
 
 
@@ -54,6 +63,32 @@ export class SeedListComponent extends React.Component<IMainProps, IMainState> {
     });
   };
 
+  public handleSubmit: any = (e: any): void => {
+    e.preventDefault();
+    Relay.Store.commitUpdate(
+      new CreateSeedMutation({
+        name: this.refs.newName.input.value,
+        description: this.refs.newDescription.input.value,
+        location: this.refs.newLocation.input.value,
+        userId: this.refs.newUserId.input.value,
+        store: this.props.store
+      })
+    );
+    this.handleClose();
+    this.refs.newName.input.value = '';
+    this.refs.newDescription.input.value = '';
+    this.refs.newLocation.input.value = '';
+    this.refs.newUserId.input.value = '';
+  }
+
+  public handleOpen: any = () => {
+    this.setVariables({ createUser: true });
+  };
+
+  public handleClose: any = () => {
+    this.setVariables({ createUser: false });
+  };
+
   public render(): any {
     const content: React.HTMLProps<HTMLLIElement> =
       this.props.store.seedConnection.edges.map(edge => {
@@ -67,14 +102,50 @@ export class SeedListComponent extends React.Component<IMainProps, IMainState> {
           <SideMenu open={this.props.relay.variables.showSideMenu} close={this.handleToggleSideMenu}/>
           <TextField hintText='Search seeds' onChange={this.search}/>
         </AppBar>
+
+        <Dialog
+          title='Create new Seed'
+          modal={false}
+          open={this.props.relay.variables.createUser}
+          onRequestClose={this.handleClose}
+          >
+          <form onSubmit={this.handleSubmit}>
+            <TextField
+              hintText='Name'
+              floatingLabelText='Name'
+              ref='newName'
+              /><br />
+            <TextField
+              hintText='Description'
+              floatingLabelText='Description'
+              ref='newDescription'
+              /><br />
+            <TextField
+              hintText='Location'
+              floatingLabelText='Location'
+              ref='newLocation'
+              /><br />
+            <TextField
+              hintText='User Id'
+              floatingLabelText='User Id'
+              ref='newUserId'
+              /><br />
+            <RaisedButton type='submit' label='New seed' primary/>
+          </form>
+        </Dialog>
+
+
         <div className='row center-xs'>
-          <div className='col-xs-12 col-sm-8 col-md-6 col-lg-4'>
+          <div className='col-xs-12 col-sm-10 col-md-8 col-lg-6'>
             <div className='box'>
               <div className='row start-xs'>
                 <div className='col-xs-12'>
                   <div className='box'>
                     <br/>
                     <Paper zDepth={2}>
+
+                      <RaisedButton label='New seed' onClick={this.handleOpen} />
+
                       <List>
                         {content}
                       </List>
@@ -95,11 +166,13 @@ export let SeedList: any = createContainer(SeedListComponent, {
   initialVariables: {
     limit: 10,
     query: '',
-    showSideMenu: false
+    showSideMenu: false,
+    createUser: false
   },
   fragments: {
     store: () => Relay.QL`
       fragment on Store {
+        id,
         seedConnection(first: $limit, query: $query) {
           pageInfo{
             hasNextPage

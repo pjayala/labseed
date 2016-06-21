@@ -120,7 +120,7 @@ export const Schema = (db: Db) => {
       seeds: {
         type: new GraphQLList(seedType),
         resolve: (parent, args) =>
-          db.collection('seeds').find({ user_id: parent.id }).toArray()
+          db.collection('seeds').find({ userId: parent.id }).toArray()
       }
     })
   });
@@ -134,10 +134,14 @@ export const Schema = (db: Db) => {
       },
       name: { type: GraphQLString },
       description: { type: GraphQLString },
+      createdAt: {
+        type: GraphQLString,
+        resolve: (obj) => new Date(obj.createdAt).toISOString()
+      },
       user: {
         type: userType,
         resolve: (parent, args) =>
-          db.collection('users').find({ id: parent.user_id }).limit(1).next()
+          db.collection('users').find({ id: parent.userId }).limit(1).next()
       },
       location: { type: GraphQLString }
     })
@@ -158,6 +162,15 @@ export const Schema = (db: Db) => {
     name: string;
     surname: string;
     email: string;
+    createdAt?: number;
+  }
+
+  interface ISeed {
+    id: string;
+    name: string;
+    description: string;
+    location: string;
+    userId: string;
     createdAt?: number;
   }
 
@@ -185,6 +198,30 @@ export const Schema = (db: Db) => {
     }
   });
 
+  let createSeedMutation: any = mutationWithClientMutationId({
+    name: 'CreateSeed',
+    inputFields: {
+      name: { type: new GraphQLNonNull(GraphQLString) },
+      description: { type: new GraphQLNonNull(GraphQLString) },
+      location: { type: new GraphQLNonNull(GraphQLString) },
+      userId: { type: new GraphQLNonNull(GraphQLString) }
+    },
+    outputFields: {
+      seedEdge: {
+        type: seedConnection.edgeType,
+        resolve: (obj: InsertOneWriteOpResult) => ({ node: obj.ops[0], cursor: obj.insertedId })
+      },
+      store: {
+        type: storeType,
+        resolve: () => store
+      }
+    },
+    mutateAndGetPayload: (seed: ISeed) => {
+      seed.createdAt = Date.now();
+      return db.collection('seeds').insertOne(seed);
+    }
+  });
+
   let schema: GraphQLSchema = new GraphQLSchema({
     query: new GraphQLObjectType({
       name: 'Query',
@@ -200,7 +237,8 @@ export const Schema = (db: Db) => {
     mutation: new GraphQLObjectType({
       name: 'Mutation',
       fields: () => ({
-        createUser: createUserMutation
+        createUser: createUserMutation,
+        createSeed: createSeedMutation
       })
     })
   });

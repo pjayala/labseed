@@ -6,4 +6,5 @@ export interface ISeed {
   description: string;
   user: IUser;
   location: string;
+  createdAt: string;
 };
