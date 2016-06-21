@@ -30,7 +30,7 @@ export class UserComponent extends React.Component<IProps, any> {
     return (
       <ListItem
         primaryText={user.id}
-        secondaryText={<p><span style={{ color: darkBlack }}>{user.email}</span> --{this.dateLabel(user) } </p>}
+        secondaryText={<p><span style={{ color: darkBlack }}>{user.email}</span> -- {this.dateLabel(user) } </p>}
         leftAvatar={
           <Avatar
             size={30}>

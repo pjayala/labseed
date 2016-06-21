@@ -4,11 +4,11 @@ import { debounce } from 'lodash';
 
 let Relay: any = require('react-relay');
 
-import { List, TextField, RaisedButton, Dialog, AppBar, Paper, Divider } from 'material-ui';
+import { List, TextField, RaisedButton, Dialog, AppBar, Paper, Divider, AutoComplete } from 'material-ui';
 
 import { CreateSeedMutation } from '../mutations/create-seed.mutation.ts';
 
-import { ISeed } from '../models/index.ts';
+import { ISeed, IUser } from '../models/index.ts';
 import { Seed } from './seed.tsx';
 import { IPageInfo } from '../models/index.ts';
 
@@ -17,6 +17,14 @@ import { SideMenu } from './side-menu.tsx';
 
 interface IMainState {
   seed: ISeed[];
+}
+
+interface IUserEdges {
+  node: IUser;
+}
+interface IConnection {
+  pageInfo: IPageInfo;
+  edges: IUserEdges[];
 }
 
 interface IEdges {
@@ -32,6 +40,7 @@ interface IMainProps {
   relay: RelayProp;
   store: {
     seedConnection: ISeedConnection;
+    userConnection: IConnection;
   };
 }
 
@@ -70,7 +79,7 @@ export class SeedListComponent extends React.Component<IMainProps, IMainState> {
         name: this.refs.newName.input.value,
         description: this.refs.newDescription.input.value,
         location: this.refs.newLocation.input.value,
-        userId: this.refs.newUserId.input.value,
+        userId: this.refs.newUserId.refs.searchTextField.input.value,
         store: this.props.store
       })
     );
@@ -78,7 +87,7 @@ export class SeedListComponent extends React.Component<IMainProps, IMainState> {
     this.refs.newName.input.value = '';
     this.refs.newDescription.input.value = '';
     this.refs.newLocation.input.value = '';
-    this.refs.newUserId.input.value = '';
+    this.refs.newUserId.refs.searchTextField.input.value = '';
   }
 
   public handleOpen: any = () => {
@@ -87,6 +96,16 @@ export class SeedListComponent extends React.Component<IMainProps, IMainState> {
 
   public handleClose: any = () => {
     this.setVariables({ createUser: false });
+  };
+
+  public getUsers: any = () => {
+    return this.props.store.userConnection.edges.map(edge => {
+      return edge.node.id;
+    });
+  };
+
+  public handleUpdateInput: any = (input: any) => {
+    this.setVariables({ userQuery: input });
   };
 
   public render(): any {
@@ -113,23 +132,32 @@ export class SeedListComponent extends React.Component<IMainProps, IMainState> {
             <TextField
               hintText='Name'
               floatingLabelText='Name'
+              fullWidth={true}
               ref='newName'
               /><br />
             <TextField
               hintText='Description'
               floatingLabelText='Description'
+              fullWidth={true}
               ref='newDescription'
               /><br />
             <TextField
               hintText='Location'
               floatingLabelText='Location'
+              fullWidth={true}
               ref='newLocation'
               /><br />
-            <TextField
-              hintText='User Id'
-              floatingLabelText='User Id'
+
+            <AutoComplete
+              hintText='Select a user'
+              floatingLabelText='User'
+              dataSource={this.getUsers()}
+              onUpdateInput={this.handleUpdateInput}
+              fullWidth={true}
+              filter={(searchText: string, key: string) => true}
               ref='newUserId'
               /><br />
+
             <RaisedButton type='submit' label='New seed' primary/>
           </form>
         </Dialog>
@@ -167,7 +195,8 @@ export let SeedList: any = createContainer(SeedListComponent, {
     limit: 10,
     query: '',
     showSideMenu: false,
-    createUser: false
+    createUser: false,
+    userQuery: ''
   },
   fragments: {
     store: () => Relay.QL`
@@ -181,6 +210,13 @@ export let SeedList: any = createContainer(SeedListComponent, {
             node {
               id,
               ${Seed.getFragment('seed')}
+            }
+          }
+        },
+        userConnection(first: 10, query: $userQuery) {
+          edges {
+            node {
+              id
             }
           }
         }

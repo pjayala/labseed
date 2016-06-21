@@ -149,7 +149,7 @@ export class UserListComponent extends React.Component<IMainProps, IMainState> {
           </form>
         </Dialog>
         <div className='row center-xs'>
-          <div className='col-xs-12 col-sm-8 col-md-6 col-lg-4'>
+          <div className='col-xs-12 col-sm-10 col-md-8 col-lg-6'>
             <div className='box'>
               <div className='row start-xs'>
                 <div className='col-xs-12'>

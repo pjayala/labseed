@@ -34,7 +34,7 @@ export class SeedComponent extends React.Component<IProps, any> {
         secondaryText={
           <p>
             <span style={{ color: darkBlack }}>{seed.location} | {seed.description} | {seed.user.id} | {seed.user.email}</span>
-            <br/> {this.dateLabel(seed) }
+            <br/> {seed.index} -- {this.dateLabel(seed)}
           </p>
         }
       />
@@ -48,6 +48,7 @@ export let Seed: any = createContainer(SeedComponent, {
     fragment on seed {
       name,
       description,
+      index,
       user {
         id,
         email

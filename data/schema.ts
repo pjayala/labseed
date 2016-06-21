@@ -4,9 +4,10 @@ import {
   GraphQLNonNull,
   GraphQLString,
   GraphQLList,
-  GraphQLID
+  GraphQLID,
+  GraphQLInt
 } from 'graphql';
-import { Db, InsertOneWriteOpResult } from 'mongodb';
+import { Db, InsertOneWriteOpResult, FindAndModifyWriteOpResultObject } from 'mongodb';
 import {
   connectionDefinitions,
   connectionArgs,
@@ -71,6 +72,7 @@ export const Schema = (db: Db) => {
           return connectionFromPromisedArray(
             db.collection('seeds')
               .find(findParams)
+              .sort({ createdAt: -1 })
               .limit(Number(args['limit']))
               .toArray(),
             args
@@ -86,7 +88,7 @@ export const Schema = (db: Db) => {
             findParams[args['field'] || 'id'] = new RegExp(args['query'], 'i');
           }
           if (!args['limit'] || args['limit'] > 200) {
-            args['limit'] = 100
+            args['limit'] = 100;
           }
           return connectionFromPromisedArray(
             db.collection('users')
@@ -134,6 +136,7 @@ export const Schema = (db: Db) => {
       },
       name: { type: GraphQLString },
       description: { type: GraphQLString },
+      index: { type: GraphQLInt },
       createdAt: {
         type: GraphQLString,
         resolve: (obj) => new Date(obj.createdAt).toISOString()
@@ -169,9 +172,19 @@ export const Schema = (db: Db) => {
     id: string;
     name: string;
     description: string;
+    index: number;
     location: string;
     userId: string;
     createdAt?: number;
+  }
+
+  interface ISequence {
+    _id: string;
+    seq: number;
+  }
+
+  interface ISequenceValue {
+    value: ISequence;
   }
 
   let createUserMutation: any = mutationWithClientMutationId({
@@ -198,6 +211,16 @@ export const Schema = (db: Db) => {
     }
   });
 
+  let getSeedNextSequence: any = (name) => {
+    let ret: Promise<FindAndModifyWriteOpResultObject>  = db.collection('counters').findOneAndUpdate(
+      { _id: name },
+      { $inc: { seq: 1 } },
+      { upsert: true }
+    );
+
+    return ret;
+  };
+
   let createSeedMutation: any = mutationWithClientMutationId({
     name: 'CreateSeed',
     inputFields: {
@@ -217,8 +240,12 @@ export const Schema = (db: Db) => {
       }
     },
     mutateAndGetPayload: (seed: ISeed) => {
-      seed.createdAt = Date.now();
-      return db.collection('seeds').insertOne(seed);
+      return (async () => {
+        seed.createdAt = Date.now();
+        let counter: ISequenceValue = await getSeedNextSequence('seedCounter');
+        seed.index = counter.value.seq;
+        return db.collection('seeds').insertOne(seed);
+      })();
     }
   });
 

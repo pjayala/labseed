@@ -32,20 +32,20 @@ injectTapEventPlugin();
 
 ReactDOM.render(
   <MuiThemeProvider muiTheme={getMuiTheme.default()}>
-  <ReactRouter.Router
-    history={browserHistory}
-    createElement={createRelayContainer}>
-    <ReactRouter.Route path='/' component={App}>
-      <ReactRouter.IndexRoute
-        components={{ content: SeedList }}
-        route={RelayRoute}/>
-      <ReactRouter.Route
-        path='/users'
-        components={{ content: UserList }}
-        route={RelayRoute}
-        />
-    </ReactRouter.Route>
-  </ReactRouter.Router>
+    <ReactRouter.Router
+      history={browserHistory}
+      createElement={createRelayContainer}>
+      <ReactRouter.Route path='/' component={App}>
+        <ReactRouter.IndexRoute
+          components={{ content: SeedList }}
+          route={RelayRoute}/>
+        <ReactRouter.Route
+          path='/users'
+          components={{ content: UserList }}
+          route={RelayRoute}
+          />
+      </ReactRouter.Route>
+    </ReactRouter.Router>
   </MuiThemeProvider>,
   document.getElementById('react')
 );
