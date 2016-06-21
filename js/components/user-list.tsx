@@ -4,6 +4,9 @@ import { debounce } from 'lodash';
 
 let Relay: any = require('react-relay');
 import { createContainer, RelayProp } from 'react-relay';
+
+import { List, TextField, RaisedButton, Dialog, AppBar, Paper, Divider } from 'material-ui';
+
 import { CreateUserMutation } from '../mutations/create-user.mutation.ts';
 
 import { User } from './user.tsx';
@@ -11,10 +14,11 @@ import { IUser } from '../models/index.ts';
 import { IPageInfo } from '../models/index.ts';
 
 import { ShowMore } from './show-more.tsx';
+import { SideMenu } from './side-menu.tsx';
 
 
 interface IMainState {
-  user: IUser[];
+  createUser: boolean;
 }
 
 interface IEdges {
@@ -44,6 +48,13 @@ export class UserListComponent extends React.Component<IMainProps, IMainState> {
 
   private setVariables: any = debounce(this.props.relay.setVariables, 300);
 
+  constructor(props: IMainProps) {
+    super(props);
+    this.state = {
+      createUser: false
+    };
+  }
+
   public showMore: any = (e: any): void => {
     this.props.relay.setVariables({ limit: this.props.relay.variables.limit + 10 });
   }
@@ -59,18 +70,33 @@ export class UserListComponent extends React.Component<IMainProps, IMainState> {
     e.preventDefault();
     Relay.Store.commitUpdate(
       new CreateUserMutation({
-        id: this.refs.newId.value,
-        name: this.refs.newName.value,
-        surname: this.refs.newSurname.value,
-        email: this.refs.newEmail.value,
+        id: this.refs.newId.input.value,
+        name: this.refs.newName.input.value,
+        surname: this.refs.newSurname.input.value,
+        email: this.refs.newEmail.input.value,
         store: this.props.store
       })
     );
-    this.refs.newId.value = '';
-    this.refs.newName.value = '';
-    this.refs.newSurname.value = '';
-    this.refs.newEmail.value = '';
+    this.handleClose();
+    this.refs.newId.input.value = '';
+    this.refs.newName.input.value = '';
+    this.refs.newSurname.input.value = '';
+    this.refs.newEmail.input.value = '';
   }
+
+  public handleToggleSideMenu: any = () => {
+    this.setVariables({
+      showSideMenu: ! this.props.relay.variables.showSideMenu
+    });
+  };
+
+  public handleOpen: any = () => {
+    this.setState({ createUser: true });
+  };
+
+  public handleClose: any = () => {
+    this.setState({ createUser: false });
+  };
 
   public dateLabel(user: IUser): string {
     if (this.props.relay.hasOptimisticUpdate(user)) {
@@ -82,24 +108,75 @@ export class UserListComponent extends React.Component<IMainProps, IMainState> {
   public render(): any {
     const content: React.HTMLProps<HTMLLIElement> =
       this.props.store.userConnection.edges.map(edge => {
-        return <User key={edge.node.id} user={edge.node}/>;
+        return <span key={edge.node.id}><User user={edge.node}/><Divider /></span>;
       });
     return (
       <div>
-        <h3>Users</h3>
-        <input type='text' placeholder='Search' onChange={this.search}/>
+        <AppBar
+          title='Users'
+          onLeftIconButtonTouchTap={this.handleToggleSideMenu}>
+          <SideMenu open={this.props.relay.variables.showSideMenu} close={this.handleToggleSideMenu}/>
+          <TextField hintText='Search users' onChange={this.search}/>
+        </AppBar>
 
-        <form onSubmit={this.handleSubmit}>
-          <input type='test' placeholder='id' ref='newId'/>
-          <input type='text' placeholder='name' ref='newName'/>
-          <input type='text' placeholder='surname' ref='newSurname'/>
-          <input type='text' placeholder='email' ref='newEmail'/>
-          <button type='submit'>New user</button>
-        </form>
-        <ul>
-          {content}
-        </ul>
-        <ShowMore pageInfo={this.props.store.userConnection.pageInfo} showMore={this.showMore}/>
+        <Dialog
+          title='Create new User'
+          modal={false}
+          open={this.state.createUser}
+          onRequestClose={this.handleClose}
+          >
+          <form onSubmit={this.handleSubmit}>
+            <TextField
+              hintText='Enter a unique user id'
+              floatingLabelText='User id'
+              ref='newId'
+              /><br />
+            <TextField
+              hintText='User name'
+              floatingLabelText='Name'
+              ref='newName'
+              /><br />
+            <TextField
+              hintText='User surname'
+              floatingLabelText='Surname'
+              ref='newSurname'
+              /><br />
+            <TextField
+              hintText='Email address'
+              floatingLabelText='Email'
+              ref='newEmail'
+              /><br />
+            <RaisedButton type='submit' label='New user' primary/>
+          </form>
+        </Dialog>
+        <div className='row center-xs'>
+          <div className='col-xs-12 col-sm-8 col-md-6 col-lg-4'>
+            <div className='box'>
+              <div className='row start-xs'>
+                <div className='col-xs-12'>
+                  <div className='box'>
+                    <br/>
+                    <Paper zDepth={2}>
+                      <RaisedButton label='New user' onClick={this.handleOpen} />
+
+                      <List>
+                        {content}
+                      </List>
+
+                      <div className='row center-xs'>
+                        <div className='col-xs-12'>
+                          <div className='box'>
+                            <ShowMore pageInfo={this.props.store.userConnection.pageInfo} showMore={this.showMore}/>
+                          </div>
+                        </div>
+                      </div>
+                    </Paper>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -108,7 +185,8 @@ export class UserListComponent extends React.Component<IMainProps, IMainState> {
 export let UserList: any = createContainer(UserListComponent, {
   initialVariables: {
     limit: 10,
-    query: ''
+    query: '',
+    showSideMenu: false
   },
   fragments: {
     store: () => Relay.QL`

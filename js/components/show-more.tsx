@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { FlatButton } from 'material-ui';
 
 import { IPageInfo } from '../models/index.ts';
 
@@ -11,7 +12,10 @@ export class ShowMore extends React.Component<IProps, any> {
   public render(): any {
     const showMoreButton: React.HTMLProps<HTMLButtonElement> | any =
       this.props.pageInfo.hasNextPage ?
-        <button type='submit' onClick={this.props.showMore}>Show more</button>
+        <FlatButton
+          type='submit'
+          onClick={this.props.showMore}
+          label='Show more'/>
         : null;
     return (
       <span>

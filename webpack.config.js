@@ -1,6 +1,8 @@
-var path = require('path');
+const path = require('path');
+const webpack = require('webpack');
 
 var APP_DIR = path.join(__dirname, '..', 'js');
+
 
 module.exports = {
   debug: true,
@@ -31,6 +33,10 @@ module.exports = {
       moment: path.join(__dirname, "/node_modules/momentjs/build/moment.min.js")
     }
   },
+  plugins: [
+    // Enables Hot Modules Replacement
+    new webpack.HotModuleReplacementPlugin()
+  ],
   devServer: {
     port: 3000
   },

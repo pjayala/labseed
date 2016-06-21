@@ -4,6 +4,10 @@ import { Router, browserHistory } from 'react-router';
 import { Route } from 'react-relay';
 let Relay: any = require('react-relay');
 let ReactRouter: any = require('react-router');
+import * as injectTapEventPlugin from 'react-tap-event-plugin';
+
+import * as getMuiTheme from 'material-ui/styles/getMuiTheme';
+import { MuiThemeProvider } from 'material-ui/styles';
 
 import { createRelayContainer } from './relay-container.tsx';
 
@@ -24,7 +28,10 @@ class RelayRoute extends Route {
   };
 }
 
+injectTapEventPlugin();
+
 ReactDOM.render(
+  <MuiThemeProvider muiTheme={getMuiTheme.default()}>
   <ReactRouter.Router
     history={browserHistory}
     createElement={createRelayContainer}>
@@ -38,6 +45,7 @@ ReactDOM.render(
         route={RelayRoute}
         />
     </ReactRouter.Route>
-  </ReactRouter.Router>,
+  </ReactRouter.Router>
+  </MuiThemeProvider>,
   document.getElementById('react')
 );

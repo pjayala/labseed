@@ -21,6 +21,7 @@
     "components/user-list.tsx",
     "components/user.tsx",
 
+    "components/side-menu.tsx",
     "components/show-more.tsx"
   ],
   // "exclude": [

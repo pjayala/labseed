@@ -6,6 +6,7 @@
     "flux": "registry:dt/flux#0.0.0+20160608061134",
     "jquery": "registry:dt/jquery#1.10.0+20160417213236",
     "lodash": "registry:dt/lodash#3.10.0+20160619033623",
+    "material-ui": "registry:dt/material-ui#0.15.0+20160608102658",
     "mime": "registry:dt/mime#0.0.0+20160316155526",
     "moment-node": "registry:dt/moment-node#2.11.1+20160511043338",
     "mongodb": "registry:dt/mongodb#2.1.0+20160602142941",
@@ -14,6 +15,7 @@
     "react-dom": "registry:dt/react-dom#0.14.0+20160412154040",
     "react-router": "registry:dt/react-router#2.0.0+20160608101747",
     "react-router/history": "registry:dt/react-router/history#2.0.0+20160608102730",
+    "react-tap-event-plugin": "registry:dt/react-tap-event-plugin#0.0.0+20160602142434",
     "serve-static": "registry:dt/serve-static#0.0.0+20160606155157"
   },
   "dependencies": {

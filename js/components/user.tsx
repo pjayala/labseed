@@ -3,6 +3,8 @@ import { createContainer, RelayProp } from 'react-relay';
 import * as moment from 'moment';
 let Relay: any = require('react-relay');
 
+import { ListItem, Avatar } from 'material-ui';
+import { darkBlack } from 'material-ui/styles/colors';
 
 import { IUser } from '../models/index.ts';
 
@@ -26,9 +28,16 @@ export class UserComponent extends React.Component<IProps, any> {
   public render(): any {
     const user: IUser = this.props.user;
     return (
-      <li>
-        {this.dateLabel(user) } | {user.id} | {user.id} | {user.email}
-      </li>
+      <ListItem
+        primaryText={user.id}
+        secondaryText={<p><span style={{ color: darkBlack }}>{user.email}</span> --{this.dateLabel(user) } </p>}
+        leftAvatar={
+          <Avatar
+            size={30}>
+            {user.id.substring(0, 1)}
+          </Avatar>
+        }
+        />
     );
   }
 };
