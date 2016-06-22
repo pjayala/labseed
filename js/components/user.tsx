@@ -32,9 +32,8 @@ export class UserComponent extends React.Component<IProps, any> {
         primaryText={user.id}
         secondaryText={<p><span style={{ color: darkBlack }}>{user.email}</span> -- {this.dateLabel(user) } </p>}
         leftAvatar={
-          <Avatar
-            size={30}>
-            {user.id.substring(0, 1)}
+          <Avatar>
+            {user.id.substring(0, 2)}
           </Avatar>
         }
         />

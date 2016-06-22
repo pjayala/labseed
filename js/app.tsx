@@ -12,8 +12,8 @@ import { MuiThemeProvider } from 'material-ui/styles';
 import { createRelayContainer } from './relay-container.tsx';
 
 import { App } from './components/app.tsx';
-import { SeedList } from './components/seed-list.tsx';
-import { UserList } from './components/user-list.tsx';
+import { SeedManager } from './components/seed-manager.tsx';
+import { UserManager } from './components/user-manager.tsx';
 
 console.log(React.version);
 
@@ -37,11 +37,11 @@ ReactDOM.render(
       createElement={createRelayContainer}>
       <ReactRouter.Route path='/' component={App}>
         <ReactRouter.IndexRoute
-          components={{ content: SeedList }}
+          components={{ content: SeedManager }}
           route={RelayRoute}/>
         <ReactRouter.Route
           path='/users'
-          components={{ content: UserList }}
+          components={{ content: UserManager }}
           route={RelayRoute}
           />
       </ReactRouter.Route>
