@@ -1,16 +1,17 @@
 import * as React from 'react';
-import * as moment from 'moment';
 import { debounce } from 'lodash';
 
 let Relay: any = require('react-relay');
 import { createContainer, RelayProp } from 'react-relay';
 
-import { List, TextField, RaisedButton, Dialog, AppBar, Paper, Divider, FloatingActionButton } from 'material-ui';
+import { TextField, Dialog, AppBar, Paper, FloatingActionButton } from 'material-ui';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 
 import { CreateUserMutation } from '../mutations/create-user.mutation.ts';
 
 import { UserList } from './user-list.tsx';
+import { UserCreateComponent } from './user-create.tsx';
+
 import { IUser } from '../models/index.ts';
 import { IPageInfo } from '../models/index.ts';
 
@@ -38,13 +39,6 @@ interface IMainProps {
 }
 
 export class UserManagerComponent extends React.Component<IMainProps, IMainState> {
-  public refs: {
-    [string: string]: any;
-    newId: any;
-    newName: any;
-    newSurname: any;
-    newEmail: any;
-  };
 
   private setVariables: any = debounce(this.props.relay.setVariables, 300);
 
@@ -66,22 +60,12 @@ export class UserManagerComponent extends React.Component<IMainProps, IMainState
     });
   }
 
-  public handleSubmit: any = (e: any): void => {
-    e.preventDefault();
+  public handleSubmit: any = (user: any): void => {
+    user.store = this.props.store;
     Relay.Store.commitUpdate(
-      new CreateUserMutation({
-        id: this.refs.newId.input.value,
-        name: this.refs.newName.input.value,
-        surname: this.refs.newSurname.input.value,
-        email: this.refs.newEmail.input.value,
-        store: this.props.store
-      })
+      new CreateUserMutation(user)
     );
     this.handleClose();
-    this.refs.newId.input.value = '';
-    this.refs.newName.input.value = '';
-    this.refs.newSurname.input.value = '';
-    this.refs.newEmail.input.value = '';
   }
 
   public handleToggleSideMenu: any = () => {
@@ -115,33 +99,7 @@ export class UserManagerComponent extends React.Component<IMainProps, IMainState
           open={this.props.relay.variables.createUser}
           onRequestClose={this.handleClose}
           >
-          <form onSubmit={this.handleSubmit}>
-            <TextField
-              hintText='Enter a unique user id'
-              floatingLabelText='User id'
-              fullWidth={true}
-              ref='newId'
-              /><br />
-            <TextField
-              hintText='User name'
-              floatingLabelText='Name'
-              fullWidth={true}
-              ref='newName'
-              /><br />
-            <TextField
-              hintText='User surname'
-              floatingLabelText='Surname'
-              fullWidth={true}
-              ref='newSurname'
-              /><br />
-            <TextField
-              hintText='Email address'
-              floatingLabelText='Email'
-              fullWidth={true}
-              ref='newEmail'
-              /><br />
-            <RaisedButton type='submit' label='New user' primary/>
-          </form>
+          <UserCreateComponent createUser={this.handleSubmit} />
         </Dialog>
         <div className='row center-xs'>
           <div className='col-xs-12 col-sm-10 col-md-8 col-lg-6'>
