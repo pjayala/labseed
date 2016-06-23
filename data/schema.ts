@@ -127,6 +127,24 @@ export const Schema = (db: Db) => {
     })
   });
 
+  let parentSeedsType = new GraphQLObjectType({
+    name: 'parentSeeds',
+    fields: () => ({
+      first: {
+        type: seedType,
+        resolve: (parent, args) => {
+          return db.collection('seeds').find({ index: parent.seedFirstParentIndex }).limit(1).next();
+        }
+      },
+      second: {
+        type: seedType,
+        resolve: (parent, args) => {
+          return db.collection('seeds').find({ index: parent.seedSecondParentIndex }).limit(1).next();
+        }
+      }
+    })
+  });
+
   seedType = new GraphQLObjectType({
     name: 'seed',
     fields: () => ({
@@ -145,6 +163,10 @@ export const Schema = (db: Db) => {
         type: userType,
         resolve: (parent, args) =>
           db.collection('users').find({ id: parent.userId }).limit(1).next()
+      },
+      parents: {
+        type: parentSeedsType,
+        resolve: (parent, args) => parent
       },
       location: { type: GraphQLString }
     })
@@ -212,7 +234,7 @@ export const Schema = (db: Db) => {
   });
 
   let getSeedNextSequence: any = (name) => {
-    let ret: Promise<FindAndModifyWriteOpResultObject>  = db.collection('counters').findOneAndUpdate(
+    let ret: Promise<FindAndModifyWriteOpResultObject> = db.collection('counters').findOneAndUpdate(
       { _id: name },
       { $inc: { seq: 1 } },
       { upsert: true }
@@ -227,7 +249,9 @@ export const Schema = (db: Db) => {
       name: { type: new GraphQLNonNull(GraphQLString) },
       description: { type: new GraphQLNonNull(GraphQLString) },
       location: { type: new GraphQLNonNull(GraphQLString) },
-      userId: { type: new GraphQLNonNull(GraphQLString) }
+      userId: { type: new GraphQLNonNull(GraphQLString) },
+      seedFirstParentIndex: { type: new GraphQLNonNull(GraphQLInt) },
+      seedSecondParentIndex: { type: new GraphQLNonNull(GraphQLInt) }
     },
     outputFields: {
       seedEdge: {

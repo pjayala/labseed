@@ -4,14 +4,14 @@ import { debounce } from 'lodash';
 
 let Relay: any = require('react-relay');
 
-import { List, TextField, RaisedButton, Dialog, AppBar, Paper, Divider, AutoComplete, FloatingActionButton } from 'material-ui';
+import { TextField, Dialog, AppBar, Paper, FloatingActionButton } from 'material-ui';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 
 import { CreateSeedMutation } from '../mutations/create-seed.mutation.ts';
 
 import { ISeed, IUser } from '../models/index.ts';
-import { Seed } from './seed.tsx';
 import { SeedList } from './seed-list.tsx';
+import { SeedCreate } from './seed-create.tsx';
 
 import { IPageInfo } from '../models/index.ts';
 
@@ -48,13 +48,7 @@ interface IMainProps {
 }
 
 export class SeedManagerComponent extends React.Component<IMainProps, IMainState> {
-  public refs: {
-    [string: string]: any;
-    newName: any;
-    newDescription: any;
-    newLocation: any;
-    newUserId: any;
-  };
+
   private setVariables: any = debounce(this.props.relay.setVariables, 300);
 
 
@@ -75,22 +69,12 @@ export class SeedManagerComponent extends React.Component<IMainProps, IMainState
     });
   };
 
-  public handleSubmit: any = (e: any): void => {
-    e.preventDefault();
+  public handleSubmit: any = (seed: any): void => {
+    seed.store = this.props.store;
     Relay.Store.commitUpdate(
-      new CreateSeedMutation({
-        name: this.refs.newName.input.value,
-        description: this.refs.newDescription.input.value,
-        location: this.refs.newLocation.input.value,
-        userId: this.refs.newUserId.refs.searchTextField.input.value,
-        store: this.props.store
-      })
+      new CreateSeedMutation(seed)
     );
     this.handleClose();
-    this.refs.newName.input.value = '';
-    this.refs.newDescription.input.value = '';
-    this.refs.newLocation.input.value = '';
-    this.refs.newUserId.refs.searchTextField.input.value = '';
   }
 
   public handleOpen: any = () => {
@@ -126,39 +110,9 @@ export class SeedManagerComponent extends React.Component<IMainProps, IMainState
           modal={false}
           open={this.props.relay.variables.createUser}
           onRequestClose={this.handleClose}
+          autoScrollBodyContent={true}
           >
-          <form onSubmit={this.handleSubmit}>
-            <TextField
-              hintText='Name'
-              floatingLabelText='Name'
-              fullWidth={true}
-              ref='newName'
-              /><br />
-            <TextField
-              hintText='Description'
-              floatingLabelText='Description'
-              fullWidth={true}
-              ref='newDescription'
-              /><br />
-            <TextField
-              hintText='Location'
-              floatingLabelText='Location'
-              fullWidth={true}
-              ref='newLocation'
-              /><br />
-
-            <AutoComplete
-              hintText='Select a user'
-              floatingLabelText='User'
-              dataSource={this.getUsers() }
-              onUpdateInput={this.handleUpdateInput}
-              fullWidth={true}
-              filter={(searchText: string, key: string) => true}
-              ref='newUserId'
-              /><br />
-
-            <RaisedButton type='submit' label='New seed' primary/>
-          </form>
+          <SeedCreate store={this.props.store} createSeed={this.handleSubmit} createUser={this.props.relay.variables.createUser}/>
         </Dialog>
 
 
@@ -210,7 +164,7 @@ export let SeedManager: any = createContainer(SeedManagerComponent, {
     userQuery: ''
   },
   fragments: {
-    store: () => Relay.QL`
+    store: (variables: any) => Relay.QL`
       fragment on Store {
         id,
         seedConnection(first: $limit, query: $query) {
@@ -219,13 +173,7 @@ export let SeedManager: any = createContainer(SeedManagerComponent, {
           },
           ${SeedList.getFragment('seeds')}
         },
-        userConnection(first: 10, query: $userQuery) {
-          edges {
-            node {
-              id
-            }
-          }
-        }
+        ${SeedCreate.getFragment('store', {createUser: variables.createUser})}
       }`
   }
 });

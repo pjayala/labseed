@@ -13,7 +13,9 @@ export class CreateSeedMutation extends Mutation<any, any> {
       name: this.props.name,
       description: this.props.description,
       location: this.props.location,
-      userId: this.props.userId
+      userId: this.props.userId,
+      seedFirstParentIndex: this.props.seedFirstParentIndex,
+      seedSecondParentIndex: this.props.seedSecondParentIndex
     };
   }
 
