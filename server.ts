@@ -6,7 +6,7 @@ import { GraphQLSchema, graphql, GraphQLResult } from 'graphql';
 let graphqlUtils: any = require('graphql/utilities');
 let graphqlHTTP: any = require('express-graphql');
 
-import { Schema } from './data/schema.ts';
+import { schema } from './data/schema.ts';
 
 let app: express.Express = express();
 app.use(express.static('public'));
@@ -17,11 +17,13 @@ let db: Db;
 (async () => {
   try {
     db = await MongoClient.connect(process.env.MONGO_URL);
-    let schema: GraphQLSchema = Schema(db);
-
     app.use('/graphql', graphqlHTTP({
       schema,
-      graphiql: true
+      graphiql: true,
+      pretty: true,
+      context: {
+        db
+      }
     }));
 
     app.get('*', function (req: express.Request, res: express.Response) {
