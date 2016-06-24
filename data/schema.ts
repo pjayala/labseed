@@ -5,7 +5,9 @@ import {
   GraphQLString,
   GraphQLList,
   GraphQLID,
-  GraphQLInt
+  GraphQLInt,
+  GraphQLInputObjectType,
+  GraphQLFieldConfig
 } from 'graphql';
 import { Db, InsertOneWriteOpResult, FindAndModifyWriteOpResultObject } from 'mongodb';
 import {
@@ -127,19 +129,31 @@ export const Schema = (db: Db) => {
     })
   });
 
-  let parentSeedsType = new GraphQLObjectType({
+  let crossType: GraphQLObjectType = new GraphQLObjectType({
     name: 'parentSeeds',
     fields: () => ({
+      name: {
+        type: GraphQLString,
+        resolve: (parent) => {
+          return (parent.name === 'BC' || parent.name === 'OC') ?
+            `${parent.name}${parent.secondIndex}F${parent.index}`
+            :
+            `${parent.name}${parent.index}`;
+        }
+      },
+      type: { type: GraphQLString },
+      index: { type: GraphQLInt },
+      secondIndex: { type: GraphQLInt },
       first: {
         type: seedType,
         resolve: (parent, args) => {
-          return db.collection('seeds').find({ index: parent.seedFirstParentIndex }).limit(1).next();
+          return db.collection('seeds').find({ index: parent.first }).limit(1).next();
         }
       },
       second: {
         type: seedType,
         resolve: (parent, args) => {
-          return db.collection('seeds').find({ index: parent.seedSecondParentIndex }).limit(1).next();
+          return db.collection('seeds').find({ index: parent.second }).limit(1).next();
         }
       }
     })
@@ -164,9 +178,9 @@ export const Schema = (db: Db) => {
         resolve: (parent, args) =>
           db.collection('users').find({ id: parent.userId }).limit(1).next()
       },
-      parents: {
-        type: parentSeedsType,
-        resolve: (parent, args) => parent
+      cross: {
+        type: crossType,
+        resolve: (parent, args) => parent.cross
       },
       location: { type: GraphQLString }
     })
@@ -198,6 +212,14 @@ export const Schema = (db: Db) => {
     location: string;
     userId: string;
     createdAt?: number;
+    cross: {
+      name: string;
+      type: string;
+      first?: number;
+      second?: number;
+      index: number;
+      secondIndex: number;
+    };
   }
 
   interface ISequence {
@@ -243,15 +265,23 @@ export const Schema = (db: Db) => {
     return ret;
   };
 
-  let createSeedMutation: any = mutationWithClientMutationId({
+  let crossSeedObject: GraphQLInputObjectType = new GraphQLInputObjectType({
+    name: 'cross',
+    fields: {
+      type: { type: new GraphQLNonNull(GraphQLString) },
+      first: { type: GraphQLInt },
+      second: { type: GraphQLInt }
+    }
+  });
+
+  let createSeedMutation: GraphQLFieldConfig = mutationWithClientMutationId({
     name: 'CreateSeed',
     inputFields: {
       name: { type: new GraphQLNonNull(GraphQLString) },
       description: { type: new GraphQLNonNull(GraphQLString) },
       location: { type: new GraphQLNonNull(GraphQLString) },
       userId: { type: new GraphQLNonNull(GraphQLString) },
-      seedFirstParentIndex: { type: new GraphQLNonNull(GraphQLInt) },
-      seedSecondParentIndex: { type: new GraphQLNonNull(GraphQLInt) }
+      cross: { type: crossSeedObject }
     },
     outputFields: {
       seedEdge: {
@@ -268,6 +298,28 @@ export const Schema = (db: Db) => {
         seed.createdAt = Date.now();
         let counter: ISequenceValue = await getSeedNextSequence('seedCounter');
         seed.index = counter.value.seq;
+        if (seed.cross.first !== null) {
+          let firstSeed: ISeed = await db.collection('seeds').find({ index: seed.cross.first }).limit(1).next();
+
+          seed.cross.secondIndex = firstSeed.cross.secondIndex;
+
+          if (seed.cross.type === 'G') {
+            seed.cross.name = firstSeed.cross.name;
+            seed.cross.index = firstSeed.cross.index + 1;
+
+          } else {
+            seed.cross.name = seed.cross.type;
+            seed.cross.index = 1;
+
+            if (seed.cross.type === 'BC' || seed.cross.type === 'OC') {
+              seed.cross.secondIndex = (firstSeed.cross.secondIndex || 0) + 1;
+            }
+          }
+        } else {
+          seed.cross.index = 0;
+          seed.cross.name = seed.cross.type;
+        }
+
         return db.collection('seeds').insertOne(seed);
       })();
     }

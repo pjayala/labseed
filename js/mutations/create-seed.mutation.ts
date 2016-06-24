@@ -9,14 +9,24 @@ export class CreateSeedMutation extends Mutation<any, any> {
   }
 
   public getVariables() {
-    return {
+    let values: any = {
       name: this.props.name,
       description: this.props.description,
       location: this.props.location,
       userId: this.props.userId,
-      seedFirstParentIndex: this.props.seedFirstParentIndex,
-      seedSecondParentIndex: this.props.seedSecondParentIndex
+      cross: {
+        type: this.props.crossingType
+      }
     };
+
+    if (this.props.seedFirstParentIndex) {
+      values.cross.first = this.props.seedFirstParentIndex;
+    }
+    if (this.props.seedSecondParentIndex) {
+      values.cross.second = this.props.seedSecondParentIndex;
+    }
+
+    return values;
   }
 
   public getFatQuery() {

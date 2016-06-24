@@ -1,14 +1,20 @@
 import * as React from 'react';
 import { createContainer, RelayProp } from 'react-relay';
 import { debounce } from 'lodash';
-
 let Relay: any = require('react-relay');
 
-import { TextField, RaisedButton, AutoComplete, MenuItem } from 'material-ui';
+import {
+  TextField,
+  RaisedButton,
+  AutoComplete,
+  RadioButtonGroup,
+  RadioButton
+} from 'material-ui';
 
 import { IUser, ISeed } from '../models/index.ts';
 
 interface IMainState {
+  disableSeedSecond: boolean;
 }
 
 interface ISeedEdges {
@@ -44,11 +50,19 @@ export class SeedCreateComponent extends React.Component<IMainProps, IMainState>
     newDescription: any;
     newLocation: any;
     newUserId: any;
+    newCrossingType: any;
     newSeedFirstParentIndex: any;
     newSeedSecondParentIndex: any;
   };
 
   private setVariables: any = debounce(this.props.relay.setVariables, 300);
+
+  constructor(props: IMainProps) {
+    super(props);
+    this.state = {
+      disableSeedSecond: true
+    };
+  }
 
   public handleSubmit: any = (e: any): void => {
     e.preventDefault();
@@ -57,13 +71,10 @@ export class SeedCreateComponent extends React.Component<IMainProps, IMainState>
       description: this.refs.newDescription.input.value,
       location: this.refs.newLocation.input.value,
       userId: this.refs.newUserId.refs.searchTextField.input.value,
+      crossingType: this.refs.newCrossingType.state.selected,
       seedFirstParentIndex: this.refs.newSeedFirstParentIndex.refs.searchTextField.input.value,
       seedSecondParentIndex: this.refs.newSeedSecondParentIndex.refs.searchTextField.input.value
     });
-    this.refs.newName.input.value = '';
-    this.refs.newDescription.input.value = '';
-    this.refs.newLocation.input.value = '';
-    this.refs.newUserId.refs.searchTextField.input.value = '';
   }
 
   public getUsers: any = () => {
@@ -91,12 +102,13 @@ export class SeedCreateComponent extends React.Component<IMainProps, IMainState>
     this.setVariables({ seedQuery: input });
   };
 
-  public render(): any {
-    const seedDataSourceConfig: any = {
-      text: 'text',
-      value: 'value'
-    };
+  public handleChangeCrossType: any = (event: any, value: string) => {
+    this.setState({
+      disableSeedSecond: value === 'G'
+    });
+  };
 
+  public render(): any {
     return (
 
       <form onSubmit={this.handleSubmit}>
@@ -130,6 +142,34 @@ export class SeedCreateComponent extends React.Component<IMainProps, IMainState>
           ref='newUserId'
           /><br />
 
+        <RadioButtonGroup
+          name='crossType'
+          defaultSelected='G'
+          onChange={this.handleChangeCrossType}
+          ref='newCrossingType'>
+          <RadioButton
+            value='G'
+            label='Self crossing'
+          />
+          <RadioButton
+            value='F'
+            label='Crossing'
+          />
+          <RadioButton
+            value='T'
+            label='Transforming'
+          />
+          <RadioButton
+            value='BC'
+            label='Back crossing'
+          />
+          <RadioButton
+            value='OC'
+            label='Out crossing'
+          />
+        </RadioButtonGroup>
+        <br />
+
         <AutoComplete
           hintText='Select first parent seed'
           floatingLabelText='Parent Seed 1'
@@ -146,6 +186,7 @@ export class SeedCreateComponent extends React.Component<IMainProps, IMainState>
           floatingLabelText='Parent Seed 2'
           dataSource={this.getSeeds() }
           onUpdateInput={this.handleSeedUpdateInput}
+          disabled={this.state.disableSeedSecond}
           fullWidth={true}
           openOnFocus={true}
           filter={(searchText: string, key: string) => true}

@@ -3,7 +3,7 @@ import { createContainer, RelayProp } from 'react-relay';
 
 let Relay: any = require('react-relay');
 
-import { List, Divider } from 'material-ui';
+import { Table, TableHeader, TableHeaderColumn, TableBody, TableRow, Divider } from 'material-ui';
 
 import { ISeed, IUser } from '../models/index.ts';
 import { Seed } from './seed.tsx';
@@ -37,12 +37,29 @@ export class SeedListComponent extends React.Component<IMainProps, IMainState> {
   public render(): any {
     const content: React.HTMLProps<HTMLLIElement> =
       this.props.seeds.edges.map(edge => {
-        return <span key={edge.node.id}><Seed seed={edge.node}/><Divider/></span>;
+        return (
+          <Seed key={edge.node.id} seed={edge.node}/>
+        );
       });
     return (
-      <List>
-        {content}
-      </List>
+      <Table>
+        <TableHeader
+          displaySelectAll={false}
+          adjustForCheckbox={false}>
+          <TableRow>
+            <TableHeaderColumn>Index</TableHeaderColumn>
+            <TableHeaderColumn>Name</TableHeaderColumn>
+            <TableHeaderColumn>Cross</TableHeaderColumn>
+            <TableHeaderColumn>Parent 1</TableHeaderColumn>
+            <TableHeaderColumn>Parent 2</TableHeaderColumn>
+            <TableHeaderColumn>Created</TableHeaderColumn>
+          </TableRow>
+        </TableHeader>
+        <TableBody
+          displayRowCheckbox={false}>
+          {content}
+        </TableBody>
+      </Table>
     );
   }
 };

@@ -8,4 +8,9 @@ export interface ISeed {
   user: IUser;
   location: string;
   createdAt: string;
+  cross: {
+    name: string;
+    first: ISeed;
+    second: ISeed;
+  };
 };
