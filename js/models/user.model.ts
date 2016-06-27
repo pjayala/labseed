@@ -1,6 +1,6 @@
 export interface IUser {
-  _id: number;
   id: string;
+  login: string;
   name: string;
   surename: string;
   email: string;
@@ -8,8 +8,8 @@ export interface IUser {
 };
 
 export class User implements IUser {
-  public _id: number;
   public id: string;
+  public login: string;
   public name: string;
   public surename: string;
   public email: string;

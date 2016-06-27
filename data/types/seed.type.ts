@@ -1,49 +1,43 @@
 import {
-  GraphQLObjectType,
-  GraphQLNonNull,
+  GraphQLObjectTypeConfig,
   GraphQLString,
-  GraphQLID,
   GraphQLInt
 } from 'graphql';
-import {
-  connectionDefinitions,
-  GraphQLConnectionDefinitions
-} from 'graphql-relay';
+import { globalIdField } from 'graphql-relay';
+import { ObjectID } from 'mongodb';
 
-import { userType } from './user.type.ts';
+import { userType, nodeDefs } from './type.ts';
 import { crossType } from './cross.type.ts';
 
-export let seedType: GraphQLObjectType = new GraphQLObjectType({
-  name: 'seed',
-  fields: () => ({
-    id: {
-      type: new GraphQLNonNull(GraphQLID),
-      resolve: (obj) => obj._id
-    },
-    name: { type: GraphQLString },
-    description: { type: GraphQLString },
-    index: { type: GraphQLInt },
-    createdAt: {
-      type: GraphQLString,
-      resolve: (obj) => new Date(obj.createdAt).toISOString()
-    },
-    user: {
-      type: userType,
-      resolve: (parent, args, context) =>
-        context.db.collection('users').find({ id: parent.userId }).limit(1).next()
-    },
-    cross: {
-      type: crossType,
-      resolve: (parent, args) => parent.cross
-    },
-    location: { type: GraphQLString }
-  })
-});
+export class SeedTypeConfig {
+  public getConfig(): GraphQLObjectTypeConfig {
+    return {
+      name: 'seed',
+      fields: () => ({
+        id: globalIdField('Seed', (seed) => seed._id),
+        name: { type: GraphQLString },
+        description: { type: GraphQLString },
+        index: { type: GraphQLInt },
+        createdAt: {
+          type: GraphQLString,
+          resolve: (obj) => new Date(obj.createdAt).toISOString()
+        },
+        user: {
+          type: userType,
+          resolve: (parent, args, context) =>
+            context.db.collection('users').find({ _id: new ObjectID(parent.userId) }).limit(1).next()
+        },
+        cross: {
+          type: crossType,
+          resolve: (parent, args) => parent.cross
+        },
+        location: { type: GraphQLString }
+      }),
+      interfaces: [nodeDefs.nodeInterface]
+    };
+  };
+};
 
-export let seedConnection: GraphQLConnectionDefinitions = connectionDefinitions({
-  name: 'seed',
-  nodeType: seedType
-});
 
 
 

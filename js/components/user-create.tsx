@@ -11,7 +11,7 @@ interface IMainProps {
 export class UserCreateComponent extends React.Component<IMainProps, IMainState> {
   public refs: {
     [string: string]: any;
-    newId: any;
+    newLogin: any;
     newName: any;
     newSurname: any;
     newEmail: any;
@@ -20,12 +20,12 @@ export class UserCreateComponent extends React.Component<IMainProps, IMainState>
   public handleSubmit: any = (e: any): void => {
     e.preventDefault();
     this.props.createUser({
-      id: this.refs.newId.input.value,
+      login: this.refs.newLogin.input.value,
       name: this.refs.newName.input.value,
       surname: this.refs.newSurname.input.value,
       email: this.refs.newEmail.input.value
     });
-    this.refs.newId.input.value = '';
+    this.refs.newLogin.input.value = '';
     this.refs.newName.input.value = '';
     this.refs.newSurname.input.value = '';
     this.refs.newEmail.input.value = '';
@@ -35,10 +35,10 @@ export class UserCreateComponent extends React.Component<IMainProps, IMainState>
     return (
       <form onSubmit={this.handleSubmit}>
         <TextField
-          hintText='Enter a unique user id'
-          floatingLabelText='User id'
+          hintText='Enter a unique user login'
+          floatingLabelText='User login'
           fullWidth={true}
-          ref='newId'
+          ref='newLogin'
           /><br />
         <TextField
           hintText='User name'

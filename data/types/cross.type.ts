@@ -4,7 +4,7 @@ import {
   GraphQLInt
 } from 'graphql';
 
-import { seedType } from './seed.type.ts';
+import { seedType } from './type.ts';
 
 export let crossType: GraphQLObjectType = new GraphQLObjectType({
   name: 'parentSeeds',

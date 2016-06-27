@@ -45,12 +45,12 @@ export class SeedComponent extends React.Component<IProps, any> {
       if (which) {
         let parentSeed: ISeed = seed.cross[which];
         if (parentSeed) {
-          id = seed.cross[which].user.id;
+          id = seed.cross[which].user.login;
           index = seed.cross[which].index;
           return `${id}-${index}`;
         }
       } else {
-        id = seed.user.id;
+        id = seed.user.login;
         index = seed.index;
         return `${id}-${index}`;
       }
@@ -81,20 +81,20 @@ export let Seed: any = createContainer(SeedComponent, {
       description,
       index,
       user {
-        id
+        login
       },
       cross {
         name,
         first {
           index,
           user {
-            id
+            login
           }
         },
         second {
           index,
           user {
-            id
+            login
           }
         }
       }

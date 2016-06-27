@@ -1,18 +1,20 @@
 import {
   GraphQLNonNull,
-  GraphQLString
+  GraphQLString,
+
 } from 'graphql';
 import { InsertOneWriteOpResult } from 'mongodb';
 import {
   mutationWithClientMutationId
 } from 'graphql-relay';
 
-import { userConnection } from '../types/user.type.ts';
+import { userConnection } from '../types/type.ts';
 
-import { store, storeType } from '../types/store.type.ts';
+import { storeType } from '../types/type.ts';
+import { store } from '../models/store.model.ts';
 
 interface IUser {
-  id: string;
+  login: string;
   name: string;
   surname: string;
   email: string;
@@ -22,7 +24,7 @@ interface IUser {
 export let createUserMutation: any = mutationWithClientMutationId({
   name: 'CreateUser',
   inputFields: {
-    id: { type: new GraphQLNonNull(GraphQLString) },
+    login: { type: new GraphQLNonNull(GraphQLString) },
     name: { type: new GraphQLNonNull(GraphQLString) },
     surname: { type: new GraphQLNonNull(GraphQLString) },
     email: { type: new GraphQLNonNull(GraphQLString) }

@@ -8,6 +8,7 @@ let graphqlHTTP: any = require('express-graphql');
 
 import { schema } from './data/schema.ts';
 
+
 let app: express.Express = express();
 app.use(express.static('public'));
 

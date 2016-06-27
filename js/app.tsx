@@ -17,11 +17,22 @@ import { UserManager } from './components/user-manager.tsx';
 
 console.log(React.version);
 
-class RelayRoute extends Route {
+class RelayRoute1 extends Route {
   public static routeName: String = 'Query';
   public static queries: any = {
     store: (Component: any) => Relay.QL`
-      query MainQuery {
+      query MainQuery1 {
+        store { ${Component.getFragment('store')} }
+      }
+    `
+  };
+}
+
+class RelayRoute2 extends Route {
+  public static routeName: String = 'Query';
+  public static queries: any = {
+    store: (Component: any) => Relay.QL`
+      query MainQuery2 {
         store { ${Component.getFragment('store')} }
       }
     `
@@ -38,11 +49,11 @@ ReactDOM.render(
       <ReactRouter.Route path='/' component={App}>
         <ReactRouter.IndexRoute
           components={{ content: SeedManager }}
-          route={RelayRoute}/>
+          route={RelayRoute1}/>
         <ReactRouter.Route
           path='/users'
           components={{ content: UserManager }}
-          route={RelayRoute}
+          route={RelayRoute2}
           />
       </ReactRouter.Route>
     </ReactRouter.Router>

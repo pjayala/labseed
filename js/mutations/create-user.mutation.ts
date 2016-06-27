@@ -10,7 +10,7 @@ export class CreateUserMutation extends Mutation<any, any> {
 
   public getVariables() {
     return {
-      id: this.props.id,
+      login: this.props.login,
       name: this.props.name,
       surname: this.props.surname,
       email: this.props.email
@@ -43,7 +43,7 @@ export class CreateUserMutation extends Mutation<any, any> {
     return {
       userEdge: {
         node: {
-          id: this.props.id,
+          login: this.props.login,
           name: this.props.name,
           surname: this.props.surname,
           email: this.props.email

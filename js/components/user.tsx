@@ -29,11 +29,11 @@ export class UserComponent extends React.Component<IProps, any> {
     const user: IUser = this.props.user;
     return (
       <ListItem
-        primaryText={user.id}
+        primaryText={user.login}
         secondaryText={<p><span style={{ color: darkBlack }}>{user.email}</span> -- {this.dateLabel(user) } </p>}
         leftAvatar={
           <Avatar>
-            {user.id.substring(0, 2)}
+            {user.login.substring(0, 2)}
           </Avatar>
         }
         />
@@ -45,7 +45,7 @@ export let User: any = createContainer(UserComponent, {
   fragments: {
     user: () => Relay.QL`
       fragment on user {
-        id,
+        login,
         email,
         createdAt
       }`

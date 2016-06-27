@@ -7,11 +7,13 @@ import {
 } from 'graphql';
 import { InsertOneWriteOpResult, FindAndModifyWriteOpResultObject } from 'mongodb';
 import {
-  mutationWithClientMutationId
+  mutationWithClientMutationId,
+  fromGlobalId
 } from 'graphql-relay';
 
-import { seedConnection } from '../types/seed.type.ts';
-import { store, storeType } from '../types/store.type.ts';
+import { storeType, seedConnection } from '../types/type.ts';
+import { store } from '../models/store.model.ts';
+
 
 interface ISeed {
   id: string;
@@ -81,6 +83,7 @@ export let createSeedMutation: GraphQLFieldConfig = mutationWithClientMutationId
   mutateAndGetPayload: (seed: ISeed, context) => {
     return (async () => {
       seed.createdAt = Date.now();
+      seed.userId = fromGlobalId(seed.userId).id;
       let counter: ISequenceValue = await getSeedNextSequence('seedCounter', context.db);
       seed.index = counter.value.seq;
       if (seed.cross.first !== undefined) {
