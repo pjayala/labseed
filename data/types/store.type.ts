@@ -45,7 +45,7 @@ export class StoreTypeConfig {
           resolve: (_, args: IConnectionArgsExt, context) => {
             let findParams: any = {};
             if (args.query) {
-              findParams[args.field || 'id'] = new RegExp(args.query, 'i');
+              findParams[args.field || 'login'] = new RegExp(args.query, 'i');
             }
             if (!args.limit || args.limit > 200) {
               args.limit = 100;

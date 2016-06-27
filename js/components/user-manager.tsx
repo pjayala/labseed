@@ -142,7 +142,7 @@ export class UserManagerComponent extends React.Component<IMainProps, IMainState
 
 export let UserManager: any = createContainer(UserManagerComponent, {
   initialVariables: {
-    limit: 2,
+    limit: 10,
     query: '',
     showSideMenu: false,
     createUser: false

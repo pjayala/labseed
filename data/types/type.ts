@@ -26,7 +26,6 @@ export let store: Store = new Store();
 
 async function idFetcher(globalId: any, context: IContext) {
   let global: ResolvedGlobalId = fromGlobalId(globalId);
-  console.log('global',global);
   if (global.type === 'Store') {
     return store;
 
@@ -44,7 +43,6 @@ async function idFetcher(globalId: any, context: IContext) {
 export let nodeDefs: GraphQLNodeDefinitions = nodeDefinitions(
   idFetcher,
   (obj) => {
-    console.log('obj',obj);
     if (obj instanceof Store) {
       return storeType;
 

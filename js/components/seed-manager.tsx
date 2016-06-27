@@ -157,7 +157,7 @@ export class SeedManagerComponent extends React.Component<IMainProps, IMainState
 
 export let SeedManager: any = createContainer(SeedManagerComponent, {
   initialVariables: {
-    limit: 1,
+    limit: 10,
     query: '',
     showSideMenu: false,
     createUser: false,

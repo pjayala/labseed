@@ -66,11 +66,14 @@ export class SeedCreateComponent extends React.Component<IMainProps, IMainState>
 
   public handleSubmit: any = (e: any): void => {
     e.preventDefault();
+    let user: IEdges = this.props.store.userConnection.edges.find(
+      (edge: IEdges) => edge.node.login === this.refs.newUserId.refs.searchTextField.input.value
+    );
     this.props.createSeed({
       name: this.refs.newName.input.value,
       description: this.refs.newDescription.input.value,
       location: this.refs.newLocation.input.value,
-      userId: this.refs.newUserId.refs.searchTextField.input.value,
+      userId: user.node.id,
       crossingType: this.refs.newCrossingType.state.selected,
       seedFirstParentIndex: this.refs.newSeedFirstParentIndex.refs.searchTextField.input.value,
       seedSecondParentIndex: this.refs.newSeedSecondParentIndex.refs.searchTextField.input.value
@@ -79,7 +82,10 @@ export class SeedCreateComponent extends React.Component<IMainProps, IMainState>
 
   public getUsers: any = () => {
     return this.props.store.userConnection ? this.props.store.userConnection.edges.map(edge => {
-      return edge.node.id;
+      return {
+        text: `${edge.node.login}`,
+        value: `${edge.node.login}  -  ${edge.node.email}`
+      };
     }) : [];
   };
 
@@ -150,23 +156,23 @@ export class SeedCreateComponent extends React.Component<IMainProps, IMainState>
           <RadioButton
             value='G'
             label='Self crossing'
-          />
+            />
           <RadioButton
             value='F'
             label='Crossing'
-          />
+            />
           <RadioButton
             value='T'
             label='Transforming'
-          />
+            />
           <RadioButton
             value='BC'
             label='Back crossing'
-          />
+            />
           <RadioButton
             value='OC'
             label='Out crossing'
-          />
+            />
         </RadioButtonGroup>
         <br />
 
@@ -211,7 +217,9 @@ export let SeedCreate: any = createContainer(SeedCreateComponent, {
         userConnection(first: 10, query: $userQuery) @include(if: $createUser) {
           edges {
             node {
-              id
+              id,
+              login,
+              email
             }
           }
         },
