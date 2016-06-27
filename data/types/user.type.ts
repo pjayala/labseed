@@ -3,10 +3,11 @@ import {
   GraphQLString,
   GraphQLList
 } from 'graphql';
-import { globalIdField } from 'graphql-relay';
+import { globalIdField, connectionFromPromisedArray } from 'graphql-relay';
 
 import { nodeDefs } from './type.ts';
-import { seedType } from './type.ts';
+import { connectionArgsExt, IConnectionArgsExt } from './connection-args.ts';
+import { seedConnection } from './type.ts';
 
 export class UserTypeConfig {
   public getConfig(): GraphQLObjectTypeConfig {
@@ -22,10 +23,25 @@ export class UserTypeConfig {
           type: GraphQLString,
           resolve: (obj) => new Date(obj.createdAt).toISOString()
         },
-        seeds: {
-          type: new GraphQLList(seedType),
-          resolve: (parent, args, context) =>
-            context.db.collection('seeds').find({ userId: `${parent._id}` }).toArray()
+        seedConnection: {
+          type: seedConnection.connectionType,
+          args: connectionArgsExt,
+          resolve: (parent, args: IConnectionArgsExt, context) => {
+            let findParams: any = { userId: `${parent._id}` };
+            if (args.query) {
+              findParams[args.field || 'name'] = new RegExp(args.query, 'i');
+            }
+            if (!args.limit || args.limit > 200) {
+              args.limit = 100;
+            }
+            return connectionFromPromisedArray(
+              context.db.collection('seeds')
+                .find(findParams)
+                .sort({ createdAt: -1 })
+                .limit(Number(args.limit))
+                .toArray(),
+              args);
+          }
         }
       }),
       interfaces: [nodeDefs.nodeInterface]
