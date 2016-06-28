@@ -36,9 +36,10 @@ interface IMainProps {
   store: {
     userConnection: IConnection;
   };
+  params: any;
 }
 
-export class UserManagerComponent extends React.Component<IMainProps, IMainState> {
+export class UserDetailsComponent extends React.Component<IMainProps, IMainState> {
 
   private setVariables: any = debounce(this.props.relay.setVariables, 300);
 
@@ -47,25 +48,9 @@ export class UserManagerComponent extends React.Component<IMainProps, IMainState
     this.state = {
       createUser: false
     };
-  }
-
-  public showMore: any = (e: any): void => {
-    this.props.relay.setVariables({ limit: this.props.relay.variables.limit + 10 });
-  }
-
-  public search: any = (e: any): void => {
     this.setVariables({
-      query: e.target.value,
-      limit: 10
+      id: this.props.params.id
     });
-  }
-
-  public handleSubmit: any = (user: any): void => {
-    user.store = this.props.store;
-    Relay.Store.commitUpdate(
-      new CreateUserMutation(user)
-    );
-    this.handleClose();
   }
 
   public handleToggleSideMenu: any = () => {
@@ -74,33 +59,16 @@ export class UserManagerComponent extends React.Component<IMainProps, IMainState
     });
   };
 
-  public handleOpen: any = () => {
-    this.setVariables({ createUser: true });
-  };
-
-  public handleClose: any = () => {
-    this.setVariables({ createUser: false });
-  };
-
   public render(): any {
 
     return (
       <div>
         <AppBar
-          title='Users'
+          title='User Details'
           onLeftIconButtonTouchTap={this.handleToggleSideMenu}>
           <SideMenu open={this.props.relay.variables.showSideMenu} close={this.handleToggleSideMenu}/>
-          <TextField hintText='Search users' onChange={this.search}/>
         </AppBar>
 
-        <Dialog
-          title='Create new User'
-          modal={false}
-          open={this.props.relay.variables.createUser}
-          onRequestClose={this.handleClose}
-          >
-          <UserCreateComponent createUser={this.handleSubmit} />
-        </Dialog>
         <div className='row center-xs'>
           <div className='col-xs-12 col-sm-10 col-md-8 col-lg-6'>
             <div className='box'>
@@ -109,25 +77,9 @@ export class UserManagerComponent extends React.Component<IMainProps, IMainState
                   <div className='box'>
                     <br/>
                     <Paper zDepth={2}>
-                      <div className='row end-xs'>
-                        <div className='col-xs-2'>
-                          <div className='box'>
-                            <FloatingActionButton onClick={this.handleOpen} mini={true}>
-                              <ContentAdd />
-                            </FloatingActionButton>
-                          </div>
-                        </div>
-                      </div>
 
                       <UserList users={this.props.store.userConnection}/>
-aa{this.props.children}aa
-                      <div className='row center-xs'>
-                        <div className='col-xs-12'>
-                          <div className='box'>
-                            <ShowMore pageInfo={this.props.store.userConnection.pageInfo} showMore={this.showMore}/>
-                          </div>
-                        </div>
-                      </div>
+
                     </Paper>
                   </div>
                 </div>
@@ -140,21 +92,16 @@ aa{this.props.children}aa
   }
 };
 
-export let UserManager: any = createContainer(UserManagerComponent, {
+export let UserDetails: any = createContainer(UserDetailsComponent, {
   initialVariables: {
-    limit: 10,
-    query: '',
     showSideMenu: false,
-    createUser: false
+    id: 'xxxx'
   },
   fragments: {
     store: () => Relay.QL`
       fragment on Store {
         id,
-        userConnection(first: $limit, query: $query) {
-          pageInfo{
-            hasNextPage
-          },
+        userConnection(first: 1, query: $id) {
           ${UserList.getFragment('users')}
         }
       }`

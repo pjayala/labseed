@@ -14,10 +14,12 @@ import { createRelayContainer } from './relay-container.tsx';
 import { App } from './components/app.tsx';
 import { SeedManager } from './components/seed-manager.tsx';
 import { UserManager } from './components/user-manager.tsx';
+import { UserDetails } from './components/user-details.tsx';
+
 
 console.log(React.version);
 
-class RelayRoute1 extends Route {
+class RelayRoute extends Route {
   public static routeName: String = 'Query';
   public static queries: any = {
     store: (Component: any) => Relay.QL`
@@ -28,32 +30,27 @@ class RelayRoute1 extends Route {
   };
 }
 
-class RelayRoute2 extends Route {
-  public static routeName: String = 'Query';
-  public static queries: any = {
-    store: (Component: any) => Relay.QL`
-      query MainQuery2 {
-        store { ${Component.getFragment('store')} }
-      }
-    `
-  };
-}
-
 injectTapEventPlugin();
 
 ReactDOM.render(
-  <MuiThemeProvider muiTheme={getMuiTheme.default()}>
+  <MuiThemeProvider muiTheme={getMuiTheme.default() }>
     <ReactRouter.Router
       history={browserHistory}
       createElement={createRelayContainer}>
       <ReactRouter.Route path='/' component={App}>
         <ReactRouter.IndexRoute
           components={{ content: SeedManager }}
-          route={RelayRoute1}/>
+          route={RelayRoute}/>
         <ReactRouter.Route
-          path='/users'
+          path='users'
           components={{ content: UserManager }}
-          route={RelayRoute2}
+          route={RelayRoute}
+          >
+        </ReactRouter.Route>
+        <ReactRouter.Route
+          path='users/:id'
+          components={{ content: UserDetails }}
+          route={RelayRoute}
           />
       </ReactRouter.Route>
     </ReactRouter.Router>
