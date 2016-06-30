@@ -7,12 +7,12 @@ import { createContainer, RelayProp } from 'react-relay';
 import { TextField, Dialog, AppBar, Paper, FloatingActionButton } from 'material-ui';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 
-import { CreateUserMutation } from '../mutations/create-user.mutation.ts';
+import { CreateUserMutation } from '../mutations/user-create.mutation.ts';
 
 import { UserList } from './user-list.tsx';
 import { UserCreateComponent } from './user-create.tsx';
 
-import { IUser } from '../models/index.ts';
+import { IUser, User } from '../models/index.ts';
 import { IPageInfo } from '../models/index.ts';
 
 import { ShowMore } from './show-more.tsx';
@@ -99,7 +99,7 @@ export class UserManagerComponent extends React.Component<IMainProps, IMainState
           open={this.props.relay.variables.createUser}
           onRequestClose={this.handleClose}
           >
-          <UserCreateComponent createUser={this.handleSubmit} />
+          <UserCreateComponent createUser={this.handleSubmit} user={new User()}/>
         </Dialog>
         <div className='row center-xs'>
           <div className='col-xs-12 col-sm-10 col-md-8 col-lg-6'>
@@ -120,7 +120,7 @@ export class UserManagerComponent extends React.Component<IMainProps, IMainState
                       </div>
 
                       <UserList users={this.props.store.userConnection}/>
-aa{this.props.children}aa
+
                       <div className='row center-xs'>
                         <div className='col-xs-12'>
                           <div className='box'>

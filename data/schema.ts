@@ -5,7 +5,7 @@ import {
 
 import { store  } from './models/store.model.ts';
 import { storeType, nodeDefs  } from './types/type.ts';
-import { createUserMutation } from './mutations/user.mutation.ts';
+import { createUserMutation, updateUserMutation } from './mutations/user.mutation.ts';
 import { createSeedMutation } from './mutations/seed.mutation.ts';
 
 export let schema: GraphQLSchema = new GraphQLSchema({
@@ -25,6 +25,7 @@ export let schema: GraphQLSchema = new GraphQLSchema({
     name: 'Mutation',
     fields: () => ({
       createUser: createUserMutation,
+      updateUser: updateUserMutation,
       createSeed: createSeedMutation
     })
   })

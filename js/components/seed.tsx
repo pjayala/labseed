@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { createContainer, RelayProp } from 'react-relay';
+import { Link } from 'react-router';
 import * as moment from 'moment';
 let Relay: any = require('react-relay');
 
@@ -65,7 +66,7 @@ export class SeedComponent extends React.Component<IProps, any> {
         <TableRowColumn>{this.getSeedId(seed)}</TableRowColumn>
         <TableRowColumn>{seed.name}</TableRowColumn>
         <TableRowColumn>{this.getName(seed)}</TableRowColumn>
-        <TableRowColumn>{this.getSeedId(seed, 'first')}</TableRowColumn>
+        <TableRowColumn><Link to={`/users/${seed.user.login}`}>{seed.user.email}</Link></TableRowColumn>
         <TableRowColumn>{this.getSeedId(seed, 'second')}</TableRowColumn>
         <TableRowColumn>{this.dateLabel(seed)}</TableRowColumn>
       </TableRow>
@@ -81,7 +82,8 @@ export let Seed: any = createContainer(SeedComponent, {
       description,
       index,
       user {
-        login
+        login,
+        email
       },
       cross {
         name,

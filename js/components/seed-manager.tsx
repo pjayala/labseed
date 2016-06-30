@@ -7,7 +7,7 @@ let Relay: any = require('react-relay');
 import { TextField, Dialog, AppBar, Paper, FloatingActionButton } from 'material-ui';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 
-import { CreateSeedMutation } from '../mutations/create-seed.mutation.ts';
+import { CreateSeedMutation } from '../mutations/seed-create.mutation.ts';
 
 import { ISeed, IUser } from '../models/index.ts';
 import { SeedList } from './seed-list.tsx';

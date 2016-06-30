@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Link } from 'react-router';
 import { createContainer, RelayProp } from 'react-relay';
 import * as moment from 'moment';
 let Relay: any = require('react-relay');
@@ -28,15 +29,17 @@ export class UserComponent extends React.Component<IProps, any> {
   public render(): any {
     const user: IUser = this.props.user;
     return (
-      <ListItem
-        primaryText={user.login}
-        secondaryText={<p><span style={{ color: darkBlack }}>{user.email}</span> -- {this.dateLabel(user) } </p>}
-        leftAvatar={
-          <Avatar>
-            {user.login.substring(0, 2)}
-          </Avatar>
-        }
-        />
+      <Link to={`/users/${user.login}`}>
+        <ListItem
+          primaryText={user.login}
+          secondaryText={<p><span style={{ color: darkBlack }}>{user.email}</span> --{this.dateLabel(user) } </p>}
+          leftAvatar={
+            <Avatar>
+              {user.login.substring(0, 2) }
+            </Avatar>
+          }
+          />
+      </Link>
     );
   }
 };
